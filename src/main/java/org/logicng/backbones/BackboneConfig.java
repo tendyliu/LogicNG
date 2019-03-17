@@ -79,11 +79,11 @@ public class BackboneConfig extends Configuration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("BackboneConfig{").append(System.lineSeparator());
-        sb.append("initialUBCheckForRotatableLiterals=").append(this.initialUBCheckForRotatableLiterals).append(System.lineSeparator());
-        sb.append("checkForComplementModelLiterals=").append(this.checkForComplementModelLiterals).append(System.lineSeparator());
-        sb.append("checkForRotatableLiterals=").append(this.checkForRotatableLiterals).append(System.lineSeparator());
-        sb.append("}").append(System.lineSeparator());
+        final StringBuilder sb = new StringBuilder("BackboneConfig{").append(String.format("%n"));
+        sb.append("initialUBCheckForRotatableLiterals=").append(this.initialUBCheckForRotatableLiterals).append(String.format("%n"));
+        sb.append("checkForComplementModelLiterals=").append(this.checkForComplementModelLiterals).append(String.format("%n"));
+        sb.append("checkForRotatableLiterals=").append(this.checkForRotatableLiterals).append(String.format("%n"));
+        sb.append("}").append(String.format("%n"));
         return sb.toString();
     }
 

@@ -108,11 +108,11 @@ public final class CleaneLingSolver extends CleaneLingStyleSolver {
         this.touched = 0;
         this.distilled = 0;
         this.original = new LNGIntVector();
-        this.clauses = new LNGVector<>();
-        this.occs = new LNGVector<>();
+        this.clauses = new LNGVector<CLClause>();
+        this.occs = new LNGVector<CLOccs[]>();
         this.candsElim = new LNGLongPriorityQueue();
         this.candsBlock = new LNGLongPriorityQueue();
-        this.tostrengthen = new LNGVector<>();
+        this.tostrengthen = new LNGVector<Pair<CLClause, Integer>>();
         this.extension = new LNGIntVector();
         this.simplifier = Simplifier.NOSIMP;
     }
@@ -352,7 +352,7 @@ public final class CleaneLingSolver extends CleaneLingStyleSolver {
             final int lit = -this.trail.get(this.next++);
             this.stats.steps++;
             final LNGVector<CLWatch> ws = watches(lit);
-            final LNGVector<CLWatch> newWS = new LNGVector<>();
+            final LNGVector<CLWatch> newWS = new LNGVector<CLWatch>();
             int i;
             for (i = 0; conflict == null && i < ws.size(); i++) {
                 final CLWatch w = ws.get(i);
@@ -716,7 +716,7 @@ public final class CleaneLingSolver extends CleaneLingStyleSolver {
      */
     private void reduce() {
         this.stats.reductions++;
-        final LNGVector<CLClause> candidates = new LNGVector<>();
+        final LNGVector<CLClause> candidates = new LNGVector<CLClause>();
         for (final CLClause c : this.clauses) { if (c.redundant() && !c.important() && !c.forcing()) { candidates.push(c); } }
         final int keep = candidates.size() / 2;
         candidates.sort(CLClause.comp);
@@ -724,7 +724,7 @@ public final class CleaneLingSolver extends CleaneLingStyleSolver {
         for (int idx = 1; idx <= maxvar(); idx++) {
             for (int sign = -1; sign <= 1; sign += 2) {
                 final LNGVector<CLWatch> ws = watches(sign * idx);
-                final LNGVector<CLWatch> newWs = new LNGVector<>(ws.size());
+                final LNGVector<CLWatch> newWs = new LNGVector<CLWatch>(ws.size());
                 for (final CLWatch w : ws) { if (!w.clause().remove()) { newWs.push(w); } }
                 ws.replaceInplace(newWs);
             }
@@ -943,7 +943,7 @@ public final class CleaneLingSolver extends CleaneLingStyleSolver {
             }
             if (count != 0) { continue; }
             if (negated != 0) {
-                this.tostrengthen.push(new Pair<>(d, negated));
+                this.tostrengthen.push(new Pair<CLClause, Integer>(d, negated));
                 this.stats.backwardStrengthened++;
             } else {
                 this.stats.backwardSubsumed++;

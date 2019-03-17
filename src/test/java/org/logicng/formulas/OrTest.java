@@ -65,7 +65,7 @@ public class OrTest {
     Assert.assertEquals(F.NA, F.f.or(F.NA, F.NA, F.NA));
     Assert.assertEquals(F.NA, F.f.or(F.NA, F.NA, F.FALSE, F.FALSE));
     Assert.assertEquals(F.TRUE, F.f.or(F.NA, F.NA, F.TRUE, F.FALSE));
-    final List<Literal> lits = new LinkedList<>();
+    final List<Literal> lits = new LinkedList<Literal>();
     lits.add(F.X);
     lits.add(F.Y);
     Assert.assertEquals(F.OR1, F.f.or(lits));
@@ -86,24 +86,24 @@ public class OrTest {
   @Test
   public void testVariables() {
     Assert.assertEquals(2, F.OR2.variables().size());
-    SortedSet<Variable> lits = new TreeSet<>(Arrays.asList(F.X, F.Y));
+    SortedSet<Variable> lits = new TreeSet<Variable>(Arrays.asList(F.X, F.Y));
     Assert.assertEquals(lits, F.OR2.variables());
 
     final Formula or = F.f.or(F.A, F.A, F.B, F.IMP3);
     Assert.assertEquals(4, or.variables().size());
-    lits = new TreeSet<>(Arrays.asList(F.A, F.B, F.X, F.Y));
+    lits = new TreeSet<Variable>(Arrays.asList(F.A, F.B, F.X, F.Y));
     Assert.assertEquals(lits, or.variables());
   }
 
   @Test
   public void testLiterals() {
     Assert.assertEquals(2, F.OR2.literals().size());
-    SortedSet<Literal> lits = new TreeSet<>(Arrays.asList(F.NX, F.NY));
+    SortedSet<Literal> lits = new TreeSet<Literal>(Arrays.asList(F.NX, F.NY));
     Assert.assertEquals(lits, F.OR2.literals());
 
     final Formula or = F.f.or(F.A, F.A, F.B, F.f.implication(F.NB, F.NA));
     Assert.assertEquals(4, or.literals().size());
-    lits = new TreeSet<>(Arrays.asList(F.A, F.NA, F.B, F.NB));
+    lits = new TreeSet<Literal>(Arrays.asList(F.A, F.NA, F.B, F.NB));
     Assert.assertEquals(lits, or.literals());
   }
 

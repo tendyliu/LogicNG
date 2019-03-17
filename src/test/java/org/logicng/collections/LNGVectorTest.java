@@ -57,26 +57,26 @@ public class LNGVectorTest {
 
   @Test
   public void testVectorCreation() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertEquals(0, v1.size());
     Assert.assertTrue(v1.empty());
-    LNGVector<String> v2 = new LNGVector<>(10);
+    LNGVector<String> v2 = new LNGVector<String>(10);
     Assert.assertEquals(0, v2.size());
     Assert.assertTrue(v2.empty());
-    LNGVector<String> v3 = new LNGVector<>(10, "string");
+    LNGVector<String> v3 = new LNGVector<String>(10, "string");
     Assert.assertEquals(10, v3.size());
     for (int i = 0; i < v3.size(); i++)
       Assert.assertEquals("string", v3.get(i));
     Assert.assertFalse(v3.empty());
-    LNGVector<String> v4 = new LNGVector<>("s1", "s2", "s3", "s4", "s5");
+    LNGVector<String> v4 = new LNGVector<String>("s1", "s2", "s3", "s4", "s5");
     Assert.assertEquals(5, v4.size());
     int count = 1;
     for (final String s : v4)
       Assert.assertEquals("s" + count++, s);
-    List<String> list = new LinkedList<>();
+    List<String> list = new LinkedList<String>();
     for (int i = 0; i < 1000; i++)
       list.add("s" + i);
-    LNGVector<String> v5 = new LNGVector<>(list);
+    LNGVector<String> v5 = new LNGVector<String>(list);
     Assert.assertEquals(1000, v5.size());
     for (int i = 0; i < 1000; i++)
       Assert.assertEquals("s" + i, v5.get(i));
@@ -84,7 +84,7 @@ public class LNGVectorTest {
 
   @Test
   public void testVectorAddElements() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++) {
       v1.push("s" + i);
@@ -99,7 +99,7 @@ public class LNGVectorTest {
 
   @Test
   public void testRelease() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++) {
       v1.push("s" + i);
@@ -114,7 +114,7 @@ public class LNGVectorTest {
 
   @Test
   public void legalUnsafePush() {
-    LNGVector<String> v1 = new LNGVector<>(1000);
+    LNGVector<String> v1 = new LNGVector<String>(1000);
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++) {
       v1.unsafePush("s" + i);
@@ -129,7 +129,7 @@ public class LNGVectorTest {
 
   @Test(expected = ArrayIndexOutOfBoundsException.class)
   public void illegalUnsafePush() {
-    LNGVector<String> v1 = new LNGVector<>(100);
+    LNGVector<String> v1 = new LNGVector<String>(100);
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++)
       v1.unsafePush("s" + i);
@@ -137,7 +137,7 @@ public class LNGVectorTest {
 
   @Test
   public void testGettingSettingAndPopping() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
     for (int i = 999; i >= 0; i--) {
@@ -152,7 +152,7 @@ public class LNGVectorTest {
 
   @Test
   public void testVectorShrink() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
@@ -168,7 +168,7 @@ public class LNGVectorTest {
 
   @Test
   public void testGrowToWithPad() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
@@ -192,7 +192,7 @@ public class LNGVectorTest {
 
   @Test
   public void testGrowTo() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 2000; i++)
       v1.push("s" + i);
@@ -217,7 +217,7 @@ public class LNGVectorTest {
 
   @Test
   public void testRemoveElements() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
@@ -234,13 +234,13 @@ public class LNGVectorTest {
 
   @Test
   public void testInplaceReplace() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
-    LNGVector<String> v2 = new LNGVector<>();
+    LNGVector<String> v2 = new LNGVector<String>();
     for (int i = 0; i < 500; i++)
       v2.push("str" + i);
-    LNGVector<String> v3 = new LNGVector<>();
+    LNGVector<String> v3 = new LNGVector<String>();
     for (int i = 0; i < 2000; i++)
       v3.push("string" + i);
     v1.replaceInplace(v2);
@@ -255,7 +255,7 @@ public class LNGVectorTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testIllegalInplaceReplace() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
     v1.replaceInplace(v1);
@@ -263,8 +263,8 @@ public class LNGVectorTest {
 
   @Test
   public void testManualSort() {
-    LNGVector<String> v1 = new LNGVector<>(1000);
-    LNGVector<String> v2 = new LNGVector<>(1000);
+    LNGVector<String> v1 = new LNGVector<String>(1000);
+    LNGVector<String> v2 = new LNGVector<String>(1000);
     for (int i = 999; i >= 0; i--)
       v1.push("s" + i);
     for (int i = 0; i < 1000; i++)
@@ -276,15 +276,15 @@ public class LNGVectorTest {
       if (i != 999)
         Assert.assertTrue(v1.get(i).compareTo(v1.get(i + 1)) < 0);
     }
-    LNGVector<String> v3 = new LNGVector<>(1000);
+    LNGVector<String> v3 = new LNGVector<String>(1000);
     v3.manualSort(stringComparator);
     Assert.assertTrue(v3.empty());
   }
 
   @Test
   public void testSort() {
-    LNGVector<String> v1 = new LNGVector<>(1000);
-    LNGVector<String> v2 = new LNGVector<>(1000);
+    LNGVector<String> v1 = new LNGVector<String>(1000);
+    LNGVector<String> v2 = new LNGVector<String>(1000);
     for (int i = 999; i >= 0; i--)
       v1.push("s" + i);
     for (int i = 0; i < 1000; i++)
@@ -296,15 +296,15 @@ public class LNGVectorTest {
       if (i != 999)
         Assert.assertTrue(v1.get(i).compareTo(v1.get(i + 1)) < 0);
     }
-    LNGVector<String> v3 = new LNGVector<>(1000);
+    LNGVector<String> v3 = new LNGVector<String>(1000);
     v3.sort(stringComparator);
     Assert.assertTrue(v3.empty());
   }
 
   @Test
   public void testSortReverse() {
-    LNGVector<String> v1 = new LNGVector<>(1000);
-    LNGVector<String> v2 = new LNGVector<>(1000);
+    LNGVector<String> v1 = new LNGVector<String>(1000);
+    LNGVector<String> v2 = new LNGVector<String>(1000);
     for (int i = 999; i >= 0; i--)
       v1.push("s" + i);
     for (int i = 0; i < 1000; i++)
@@ -316,14 +316,14 @@ public class LNGVectorTest {
       if (i != 999)
         Assert.assertTrue(v1.get(i).compareTo(v1.get(i + 1)) > 0);
     }
-    LNGVector<String> v3 = new LNGVector<>(1000);
+    LNGVector<String> v3 = new LNGVector<String>(1000);
     v3.sortReverse(stringComparator);
     Assert.assertTrue(v3.empty());
   }
 
   @Test
   public void testRemove() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
@@ -348,7 +348,7 @@ public class LNGVectorTest {
     Assert.assertEquals("s499", v1.get(498));
     Assert.assertEquals("s501", v1.get(499));
     Assert.assertEquals("s998", v1.get(996));
-    LNGVector<String> v2 = new LNGVector<>("s1", "s1", "s2", "s5", "s8");
+    LNGVector<String> v2 = new LNGVector<String>("s1", "s1", "s2", "s5", "s8");
     v2.remove("s1");
     Assert.assertEquals(4, v2.size());
     Assert.assertEquals("[s1, s2, s5, s8]", v2.toString());
@@ -356,7 +356,7 @@ public class LNGVectorTest {
 
   @Test
   public void testToArray() {
-    LNGVector<String> v1 = new LNGVector<>(1000);
+    LNGVector<String> v1 = new LNGVector<String>(1000);
     String[] expected = new String[500];
     for (int i = 0; i < 1000; i++) {
       v1.push("s" + i);
@@ -369,7 +369,7 @@ public class LNGVectorTest {
 
   @Test
   public void testIterator() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
@@ -380,7 +380,7 @@ public class LNGVectorTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testIllegalIteratorRemoval() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
@@ -392,7 +392,7 @@ public class LNGVectorTest {
 
   @Test(expected = NoSuchElementException.class)
   public void testIllegalIteratorTraversal() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertTrue(v1.empty());
     for (int i = 0; i < 1000; i++)
       v1.push("s" + i);
@@ -404,7 +404,7 @@ public class LNGVectorTest {
 
   @Test
   public void testToString() {
-    LNGVector<String> v1 = new LNGVector<>();
+    LNGVector<String> v1 = new LNGVector<String>();
     Assert.assertEquals("[]", v1.toString());
     v1.push("s1");
     Assert.assertEquals("[s1]", v1.toString());

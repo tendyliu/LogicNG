@@ -207,7 +207,7 @@ public class AssignmentTest {
     Formula bc02 = ass.blockingClause(F.f, null);
     Assert.assertFalse(bc02.containsVariable(F.C));
     Assert.assertEquals("~a | ~b | x | y", bc02.toString());
-    List<Literal> lits = new ArrayList<>();
+    List<Literal> lits = new ArrayList<Literal>();
     lits.add(F.A);
     lits.add(F.X);
     lits.add(F.C);

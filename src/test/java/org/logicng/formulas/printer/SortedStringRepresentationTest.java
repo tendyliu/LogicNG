@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link SortedStringRepresentation}
@@ -48,7 +48,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
  */
 public class SortedStringRepresentationTest {
 
-    private final List<Variable> varOrder = new ArrayList<>(Arrays.asList(F.Y, F.X, F.B, F.A, F.C));
+    private final List<Variable> varOrder = new ArrayList<Variable>(Arrays.asList(F.Y, F.X, F.B, F.A, F.C));
 
     private final FormulaStringRepresentation sr = new SortedStringRepresentation(this.varOrder);
 
@@ -85,7 +85,7 @@ public class SortedStringRepresentationTest {
         assertThat(F.f.string(F.f.or(F.A, F.B, F.C, F.X), this.sr)).isEqualTo("x | b | a | c");
         assertThat(F.f.string(F.PBC2, this.sr)).isEqualTo("3*x + -4*b + 2*a > 2");
         assertThat(F.f.string(F.f.and(F.NB, F.PBC1), this.sr)).isEqualTo("(3*x + -4*b + 2*a = 2) & ~b");
-        assertThat(F.f.string(F.f.pbc(CType.EQ, 42, new ArrayList<Literal>(Arrays.asList(F.A, F.B)), new ArrayList<>(Arrays.asList(1, 1))), this.sr)).isEqualTo("b + a = 42");
+        assertThat(F.f.string(F.f.pbc(CType.EQ, 42, new ArrayList<Literal>(Arrays.asList(F.A, F.B)), new ArrayList<Integer>(Arrays.asList(1, 1))), this.sr)).isEqualTo("b + a = 42");
         assertThat(F.f.string(F.f.pbc(CType.LT, 42, new ArrayList<Literal>(), new ArrayList<Integer>()), this.sr)).isEqualTo("$true");
         assertThat(F.f.string(F.f.pbc(CType.EQ, 42, new ArrayList<Literal>(), new ArrayList<Integer>()), this.sr)).isEqualTo("$false");
 

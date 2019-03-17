@@ -105,8 +105,8 @@ public final class CleaneLing extends SATSolver {
         this.result = UNDEF;
         this.solverStyle = solverStyle;
         this.plain = config.plain();
-        this.name2idx = new TreeMap<>();
-        this.idx2name = new TreeMap<>();
+        this.name2idx = new TreeMap<String, Integer>();
+        this.idx2name = new TreeMap<Integer, String>();
         this.ccEncoder = new CCEncoder(f);
     }
 
@@ -183,7 +183,7 @@ public final class CleaneLing extends SATSolver {
     @Override
     protected void addClauseWithRelaxation(final Variable relaxationVar, final Formula formula) {
         this.result = UNDEF;
-        final SortedSet<Literal> literals = new TreeSet<>(formula.literals());
+        final SortedSet<Literal> literals = new TreeSet<Literal>(formula.literals());
         literals.add(relaxationVar);
         addClause(literals);
     }
@@ -227,8 +227,8 @@ public final class CleaneLing extends SATSolver {
         if (this.solverStyle == SolverStyle.FULL && !this.plain) {
             throw new UnsupportedOperationException("Model enumeration is not available if simplifications are turned on");
         }
-        final List<Assignment> models = new LinkedList<>();
-        SortedSet<Variable> allVariables = new TreeSet<>();
+        final List<Assignment> models = new LinkedList<Assignment>();
+        SortedSet<Variable> allVariables = new TreeSet<Variable>();
         if (variables == null) {
             allVariables = null;
         } else {
@@ -254,9 +254,9 @@ public final class CleaneLing extends SATSolver {
         if (this.solverStyle == SolverStyle.FULL && !this.plain) {
             throw new UnsupportedOperationException("Model enumeration is not available if simplifications are turned on");
         }
-        final List<Assignment> models = new LinkedList<>();
+        final List<Assignment> models = new LinkedList<Assignment>();
         boolean proceed = true;
-        SortedSet<Variable> allVariables = new TreeSet<>();
+        SortedSet<Variable> allVariables = new TreeSet<Variable>();
         if (variables == null) {
             allVariables = null;
         } else {
@@ -285,7 +285,7 @@ public final class CleaneLing extends SATSolver {
 
     @Override
     public SortedSet<Variable> knownVariables() {
-        final SortedSet<Variable> result = new TreeSet<>();
+        final SortedSet<Variable> result = new TreeSet<Variable>();
         for (final String name : this.name2idx.keySet()) { result.add(this.f.variable(name)); }
         return result;
     }
@@ -387,7 +387,7 @@ public final class CleaneLing extends SATSolver {
             return null;
         }
         final LNGIntVector literals = this.solver.upZeroLiterals();
-        final SortedSet<Literal> upZeroLiterals = new TreeSet<>();
+        final SortedSet<Literal> upZeroLiterals = new TreeSet<Literal>();
         for (int i = 0; i < literals.size(); ++i) {
             upZeroLiterals.add(getLiteralFromIntLiteral(literals.get(i)));
         }

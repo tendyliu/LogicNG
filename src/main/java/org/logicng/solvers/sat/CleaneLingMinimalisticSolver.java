@@ -222,7 +222,7 @@ public final class CleaneLingMinimalisticSolver extends CleaneLingStyleSolver {
         while (conflict == null && this.next < this.trail.size()) {
             final int lit = -this.trail.get(this.next++);
             final LNGVector<CLWatch> ws = watches(lit);
-            final LNGVector<CLWatch> newWS = new LNGVector<>();
+            final LNGVector<CLWatch> newWS = new LNGVector<CLWatch>();
             int i;
             for (i = 0; conflict == null && i < ws.size(); i++) {
                 final CLWatch w = ws.get(i);

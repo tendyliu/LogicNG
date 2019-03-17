@@ -65,9 +65,9 @@ public abstract class Formula implements Iterable<Formula> {
     protected Formula(final FType type, final FormulaFactory f) {
         this.type = type;
         this.f = f;
-        this.transformationCache = new HashMap<>();
-        this.predicateCache = new HashMap<>();
-        this.functionCache = new HashMap<>();
+        this.transformationCache = new HashMap<CacheEntry, Formula>();
+        this.predicateCache = new HashMap<CacheEntry, Tristate>();
+        this.functionCache = new HashMap<CacheEntry, Object>();
         this.variables = null;
         this.numberOfAtoms = -1;
         this.numberOfNodes = -1;
@@ -251,7 +251,9 @@ public abstract class Formula implements Iterable<Formula> {
             try {
                 final VariableOrderingProvider provider = variableOrdering.provider().newInstance();
                 factory.setVariableOrder(provider.getOrder(this));
-            } catch (final InstantiationException | IllegalAccessException e) {
+            } catch (final InstantiationException e) {
+                throw new IllegalStateException("Could not generate the BDD variable ordering provider", e);
+            } catch (final IllegalAccessException e) {
                 throw new IllegalStateException("Could not generate the BDD variable ordering provider", e);
             }
         }

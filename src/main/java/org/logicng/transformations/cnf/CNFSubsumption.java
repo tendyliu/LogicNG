@@ -60,7 +60,7 @@ public class CNFSubsumption extends Subsumption implements FormulaTransformation
         }
         assert formula.type() == FType.AND;
         final UBTree<Literal> ubTree = generateSubsumedUBTree(formula);
-        final List<Formula> clauses = new LinkedList<>();
+        final List<Formula> clauses = new LinkedList<Formula>();
         for (final SortedSet<Literal> literals : ubTree.allSets()) {
             clauses.add(formula.factory().clause(literals));
         }

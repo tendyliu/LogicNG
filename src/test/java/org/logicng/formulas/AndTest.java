@@ -67,7 +67,7 @@ public class AndTest {
     Assert.assertEquals(F.NA, F.f.and(F.NA, F.NA, F.NA));
     Assert.assertEquals(F.NA, F.f.and(F.NA, F.NA, F.TRUE, F.TRUE));
     Assert.assertEquals(F.FALSE, F.f.and(F.NA, F.NA, F.FALSE, F.TRUE));
-    final List<Literal> lits = new LinkedList<>();
+    final List<Literal> lits = new LinkedList<Literal>();
     lits.add(F.A);
     lits.add(F.B);
     Assert.assertEquals(F.AND1, F.f.and(lits));
@@ -93,24 +93,24 @@ public class AndTest {
   @Test
   public void testVariables() {
     Assert.assertEquals(2, F.AND2.variables().size());
-    SortedSet<Variable> lits = new TreeSet<>(Arrays.asList(F.A, F.B));
+    SortedSet<Variable> lits = new TreeSet<Variable>(Arrays.asList(F.A, F.B));
     Assert.assertEquals(lits, F.AND2.variables());
 
     final Formula and = F.f.and(F.A, F.A, F.B, F.IMP3);
     Assert.assertEquals(4, and.variables().size());
-    lits = new TreeSet<>(Arrays.asList(F.A, F.B, F.X, F.Y));
+    lits = new TreeSet<Variable>(Arrays.asList(F.A, F.B, F.X, F.Y));
     Assert.assertEquals(lits, and.variables());
   }
 
   @Test
   public void testLiterals() {
     Assert.assertEquals(2, F.AND2.literals().size());
-    SortedSet<Literal> lits = new TreeSet<>(Arrays.asList(F.NA, F.NB));
+    SortedSet<Literal> lits = new TreeSet<Literal>(Arrays.asList(F.NA, F.NB));
     Assert.assertEquals(lits, F.AND2.literals());
 
     final Formula and = F.f.and(F.A, F.A, F.B, F.f.implication(F.NA, F.NB));
     Assert.assertEquals(4, and.literals().size());
-    lits = new TreeSet<>(Arrays.asList(F.A, F.NA, F.B, F.NB));
+    lits = new TreeSet<Literal>(Arrays.asList(F.A, F.NA, F.B, F.NB));
     Assert.assertEquals(lits, and.literals());
   }
 

@@ -58,7 +58,7 @@ public class BackboneGeneration {
     }
 
     private static SortedSet<Variable> allVariablesInFormulas(final Collection<Formula> formulas) {
-        final SortedSet<Variable> variables = new TreeSet<>();
+        final SortedSet<Variable> variables = new TreeSet<Variable>();
         for (final Formula formula : formulas) {
             variables.addAll(formula.variables());
         }

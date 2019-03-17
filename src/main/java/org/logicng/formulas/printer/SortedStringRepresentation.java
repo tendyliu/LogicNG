@@ -141,7 +141,7 @@ public final class SortedStringRepresentation extends DefaultStringRepresentatio
      */
     @Override
     protected String naryOperator(final NAryOperator operator, final String opString) {
-        final List<Formula> operands = new ArrayList<>();
+        final List<Formula> operands = new ArrayList<Formula>();
         for (final Formula op : operator) {
             operands.add(op);
         }
@@ -174,8 +174,8 @@ public final class SortedStringRepresentation extends DefaultStringRepresentatio
     @Override
     protected String pbLhs(final Literal[] operands, final int[] coefficients) {
         assert operands.length == coefficients.length;
-        final List<Literal> sortedOperands = new ArrayList<>();
-        final List<Integer> sortedCoefficients = new ArrayList<>();
+        final List<Literal> sortedOperands = new ArrayList<Literal>();
+        final List<Integer> sortedCoefficients = new ArrayList<Integer>();
         final List<Literal> givenOperands = Arrays.asList(operands);
         for (final Variable v : this.varOrder) {
             final int index = givenOperands.indexOf(v);
@@ -250,8 +250,8 @@ public final class SortedStringRepresentation extends DefaultStringRepresentatio
          */
         @Override
         public int compare(final Formula formula1, final Formula formula2) {
-            final SortedSet<Variable> vars1 = new TreeSet<>(formula1.variables());
-            final SortedSet<Variable> vars2 = new TreeSet<>(formula2.variables());
+            final SortedSet<Variable> vars1 = new TreeSet<Variable>(formula1.variables());
+            final SortedSet<Variable> vars2 = new TreeSet<Variable>(formula2.variables());
             for (final Variable v : this.varOrder) {
                 if (vars1.isEmpty() && vars2.isEmpty()) {
                     break;

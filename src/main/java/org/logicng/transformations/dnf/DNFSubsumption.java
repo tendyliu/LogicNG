@@ -60,7 +60,7 @@ public class DNFSubsumption extends Subsumption implements FormulaTransformation
         }
         assert formula.type() == FType.OR;
         final UBTree<Literal> ubTree = generateSubsumedUBTree(formula);
-        final List<Formula> minterms = new LinkedList<>();
+        final List<Formula> minterms = new LinkedList<Formula>();
         for (final SortedSet<Literal> literals : ubTree.allSets()) {
             minterms.add(formula.factory().and(literals));
         }

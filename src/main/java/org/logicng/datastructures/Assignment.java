@@ -260,7 +260,7 @@ public class Assignment {
    * @return the blocking clause for this assignment
    */
   public Formula blockingClause(final FormulaFactory f) {
-    final List<Literal> ops = new LinkedList<>();
+    final List<Literal> ops = new LinkedList<Literal>();
     for (final Literal lit : this.pos)
       ops.add(lit.negate());
     for (final Literal lit : this.neg)
@@ -278,7 +278,7 @@ public class Assignment {
   public Formula blockingClause(final FormulaFactory f, final Collection<? extends Literal> literals) {
     if (literals == null)
       return blockingClause(f);
-    final List<Literal> ops = new LinkedList<>();
+    final List<Literal> ops = new LinkedList<Literal>();
     for (Literal lit : literals) {
       Variable var = lit.variable();
       Literal negatedVar = var.negate();

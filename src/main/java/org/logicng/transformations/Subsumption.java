@@ -25,16 +25,16 @@ public abstract class Subsumption {
      * @return the UBTree with the operands and deleted subsumed operands
      */
     protected static UBTree<Literal> generateSubsumedUBTree(final Formula formula) {
-        final SortedMap<Integer, List<SortedSet<Literal>>> mapping = new TreeMap<>();
+        final SortedMap<Integer, List<SortedSet<Literal>>> mapping = new TreeMap<Integer, List<SortedSet<Literal>>>();
         for (final Formula term : formula) {
             List<SortedSet<Literal>> terms = mapping.get(term.literals().size());
             if (terms == null) {
-                terms = new LinkedList<>();
+                terms = new LinkedList<SortedSet<Literal>>();
                 mapping.put(term.literals().size(), terms);
             }
             terms.add(term.literals());
         }
-        final UBTree<Literal> ubTree = new UBTree<>();
+        final UBTree<Literal> ubTree = new UBTree<Literal>();
         for (final Map.Entry<Integer, List<SortedSet<Literal>>> entry : mapping.entrySet()) {
             for (final SortedSet<Literal> set : entry.getValue()) {
                 if (ubTree.firstSubset(set) == null) {

@@ -35,7 +35,6 @@ import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
 
 import java.util.Collections;
-import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -132,7 +131,7 @@ public class Backbone {
      * @return the set of both positive and negative backbone variables as literals
      */
     public SortedSet<Literal> getCompleteBackbone() {
-        final SortedSet<Literal> completeBackbone = new TreeSet<>();
+        final SortedSet<Literal> completeBackbone = new TreeSet<Literal>();
         if (hasPositiveBackboneResult()) {
             completeBackbone.addAll(this.positiveBackbone);
         }
@@ -159,7 +158,7 @@ public class Backbone {
      * @return the mapping of the backbone
      */
     public SortedMap<Variable, Tristate> toMap() {
-        final SortedMap<Variable, Tristate> map = new TreeMap<>();
+        final SortedMap<Variable, Tristate> map = new TreeMap<Variable, Tristate>();
         if (hasPositiveBackboneResult()) {
             for (final Variable var : this.positiveBackbone) {
                 map.put(var, Tristate.TRUE);
@@ -179,25 +178,30 @@ public class Backbone {
     }
 
     @Override
-    public boolean equals(final Object other) {
-        if (other == null) {
-            return false;
-        }
-        if (this == other) {
+    public boolean equals(final Object o) {
+        if (this == o) {
             return true;
         }
-        if (getClass() != other.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final Backbone backbone = (Backbone) other;
-        return Objects.equals(this.positiveBackbone, backbone.positiveBackbone) &&
-                Objects.equals(this.negativeBackbone, backbone.negativeBackbone) &&
-                Objects.equals(this.optionalVariables, backbone.optionalVariables);
+        final Backbone backbone = (Backbone) o;
+        if (this.positiveBackbone != null ? !this.positiveBackbone.equals(backbone.positiveBackbone) : backbone.positiveBackbone != null) {
+            return false;
+        }
+        if (this.negativeBackbone != null ? !this.negativeBackbone.equals(backbone.negativeBackbone) : backbone.negativeBackbone != null) {
+            return false;
+        }
+        return this.optionalVariables != null ? this.optionalVariables.equals(backbone.optionalVariables) : backbone.optionalVariables == null;
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.positiveBackbone, this.negativeBackbone, this.optionalVariables);
+        int result = this.positiveBackbone != null ? this.positiveBackbone.hashCode() : 0;
+        result = 31 * result + (this.negativeBackbone != null ? this.negativeBackbone.hashCode() : 0);
+        result = 31 * result + (this.optionalVariables != null ? this.optionalVariables.hashCode() : 0);
+        return result;
     }
 
     @Override

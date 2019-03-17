@@ -837,14 +837,14 @@ public class SATTest {
   @Test
   public void testUPZeroLiterals() throws ParserException {
     // Note: The complete unit propagated set of literals on level 0 depends on each solver's added learned clauses during the solving process
-    final Map<Formula, SortedSet<Literal>> expectedSubsets = new HashMap<>();
+    final Map<Formula, SortedSet<Literal>> expectedSubsets = new HashMap<Formula, SortedSet<Literal>>();
     expectedSubsets.put(this.f.verum(), new TreeSet<Literal>());
-    expectedSubsets.put(this.parser.parse("a"), new TreeSet<>(Collections.singletonList(this.f.literal("a", true))));
+    expectedSubsets.put(this.parser.parse("a"), new TreeSet<Literal>(Collections.singletonList(this.f.literal("a", true))));
     expectedSubsets.put(this.parser.parse("a | b"), new TreeSet<Literal>());
-    expectedSubsets.put(this.parser.parse("a & b"), new TreeSet<>(Arrays.asList(this.f.literal("a", true), this.f.literal("b", true))));
-    expectedSubsets.put(this.parser.parse("a & ~b"), new TreeSet<>(Arrays.asList(this.f.literal("a", true), this.f.literal("b", false))));
-    expectedSubsets.put(this.parser.parse("(a | c) & ~b"), new TreeSet<>(Collections.singletonList(this.f.literal("b", false))));
-    expectedSubsets.put(this.parser.parse("(b | c) & ~b & (~c | d)"), new TreeSet<>(Arrays.asList(
+    expectedSubsets.put(this.parser.parse("a & b"), new TreeSet<Literal>(Arrays.asList(this.f.literal("a", true), this.f.literal("b", true))));
+    expectedSubsets.put(this.parser.parse("a & ~b"), new TreeSet<Literal>(Arrays.asList(this.f.literal("a", true), this.f.literal("b", false))));
+    expectedSubsets.put(this.parser.parse("(a | c) & ~b"), new TreeSet<Literal>(Collections.singletonList(this.f.literal("b", false))));
+    expectedSubsets.put(this.parser.parse("(b | c) & ~b & (~c | d)"), new TreeSet<Literal>(Arrays.asList(
             this.f.literal("b", false), this.f.literal("c", true), this.f.literal("d", true))));
     for (final SATSolver solver : this.solvers) {
       for (final Formula formula : expectedSubsets.keySet()) {
@@ -871,7 +871,7 @@ public class SATTest {
           final boolean res = solver.sat() == TRUE;
           if (res) {
             final SortedSet<Literal> upZeroLiterals = solver.upZeroLiterals();
-            final List<Literal> negations = new ArrayList<>(upZeroLiterals.size());
+            final List<Literal> negations = new ArrayList<Literal>(upZeroLiterals.size());
             for (final Literal lit : upZeroLiterals) {
               negations.add(lit.negate());
             }

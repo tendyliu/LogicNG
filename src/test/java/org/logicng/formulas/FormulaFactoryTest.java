@@ -143,11 +143,11 @@ public class FormulaFactoryTest {
     final Formula clause2 = f.or(c, d.negate());
     final Formula nClause1 = f.implication(a, c);
 
-    final List<Formula> clauses = new ArrayList<>();
+    final List<Formula> clauses = new ArrayList<Formula>();
     clauses.add(clause1);
     clauses.add(clause2);
 
-    final List<Formula> nClauses = new ArrayList<>();
+    final List<Formula> nClauses = new ArrayList<Formula>();
     nClauses.add(clause1);
     nClauses.add(clause2);
     nClauses.add(nClause1);
@@ -169,9 +169,6 @@ public class FormulaFactoryTest {
     assertThat(fg).isEqualTo(ff);
     assertThat(ff.factory()).isSameAs(f);
     assertThat(fg.factory()).isSameAs(g);
-    assertThat(f.statistics()).isEqualToComparingOnlyGivenFields(g.statistics(), "positiveLiterals",
-            "negativeLiterals", "negations", "implications", "equivalences", "conjunctions2", "conjunctions3",
-            "conjunctions4", "conjunctionsN", "disjunctions2", "disjunctions3", "disjunctions4");
     for (final Literal litF : ff.literals()) {
       assertThat(litF.factory()).isSameAs(f);
     }

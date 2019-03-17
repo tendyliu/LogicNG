@@ -1,6 +1,5 @@
 package org.logicng.datastructures.ubtrees;
 
-import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -21,9 +20,9 @@ public class UBNode<T extends Comparable<T>> {
      * Constructs a new UB Tree node with the given element.
      * @param element the node's element
      */
-    UBNode(T element) {
+    UBNode(final T element) {
         this.element = element;
-        this.children = new TreeMap<>();
+        this.children = new TreeMap<T, UBNode<T>>();
     }
 
     /**
@@ -69,26 +68,38 @@ public class UBNode<T extends Comparable<T>> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        UBNode<?> ubNode = (UBNode<?>) o;
-        return Objects.equals(element, ubNode.element) &&
-                Objects.equals(children, ubNode.children) &&
-                Objects.equals(set, ubNode.set);
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final UBNode<?> ubNode = (UBNode<?>) o;
+        if (this.element != null ? !this.element.equals(ubNode.element) : ubNode.element != null) {
+            return false;
+        }
+        if (this.children != null ? !this.children.equals(ubNode.children) : ubNode.children != null) {
+            return false;
+        }
+        return this.set != null ? this.set.equals(ubNode.set) : ubNode.set == null;
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(element, children, set);
+        int result = this.element != null ? this.element.hashCode() : 0;
+        result = 31 * result + (this.children != null ? this.children.hashCode() : 0);
+        result = 31 * result + (this.set != null ? this.set.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return "UBNode{" +
-                "element=" + element +
-                ", children=" + children +
-                ", set=" + set +
+                "element=" + this.element +
+                ", children=" + this.children +
+                ", set=" + this.set +
                 '}';
     }
 }
