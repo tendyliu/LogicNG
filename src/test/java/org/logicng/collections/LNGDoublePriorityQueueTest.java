@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -46,7 +46,7 @@ public class LNGDoublePriorityQueueTest {
   }
 
   @Test
-  public void testPushPopAndContaints() {
+  public void testPushPopAndContains() {
     LNGDoublePriorityQueue q1 = new LNGDoublePriorityQueue();
     q1.push(0);
     q1.push(1);

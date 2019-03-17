@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -69,7 +69,7 @@ public abstract class Constant extends Formula {
    * @param type    the constant type
    * @param factory the factory which created this instance
    */
-  protected Constant(final FType type, final FormulaFactory factory) {
+  Constant(final FType type, final FormulaFactory factory) {
     super(type, factory);
   }
 
@@ -86,6 +86,11 @@ public abstract class Constant extends Formula {
   @Override
   public int numberOfOperands() {
     return 0;
+  }
+
+  @Override
+  public boolean isConstantFormula() {
+    return true;
   }
 
   @Override

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -138,7 +138,7 @@ public final class PBConstraint extends Formula {
           isTrivialTrue = rhs < 0;
           break;
         default:
-          throw new IllegalArgumentException("Unknown comperator: " + comparator);
+          throw new IllegalArgumentException("Unknown comparator: " + comparator);
       }
       isTrivialFalse = !isTrivialTrue;
     } else {
@@ -406,6 +406,11 @@ public final class PBConstraint extends Formula {
   }
 
   @Override
+  public boolean isConstantFormula() {
+    return false;
+  }
+
+  @Override
   public boolean isAtomicFormula() {
     return true;
   }
@@ -451,7 +456,7 @@ public final class PBConstraint extends Formula {
     int maxValue = 0;
     for (int i = 0; i < this.literals.length; i++) {
       final Formula restriction = assignment.restrictLit(this.literals[i]);
-      if (restriction == null) {
+      if (restriction.type == FType.LITERAL) {
         newLits.add(this.literals[i]);
         final int coeff = this.coefficients[i];
         newCoeffs.add(coeff);
@@ -463,8 +468,9 @@ public final class PBConstraint extends Formula {
         lhsFixed += this.coefficients[i];
     }
 
-    if (newLits.isEmpty())
-      return f.constant(this.evaluateComparator(lhsFixed));
+    if (newLits.isEmpty()) {
+      return this.f.constant(this.evaluateComparator(lhsFixed));
+    }
 
     final int newRHS = this.rhs - lhsFixed;
     if (this.comparator != CType.EQ) {
@@ -520,7 +526,7 @@ public final class PBConstraint extends Formula {
       }
     }
     return newLits.isEmpty()
-            ? f.constant(this.evaluateComparator(lhsFixed))
+            ? this.evaluateComparator(lhsFixed) ? this.f.verum() : this.f.falsum()
             : this.f.pbc(this.comparator, this.rhs - lhsFixed, newLits, newCoeffs);
   }
 

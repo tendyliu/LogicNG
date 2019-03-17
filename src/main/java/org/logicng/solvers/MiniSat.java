@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -27,9 +27,6 @@
 ///////////////////////////////////////////////////////////////////////////
 
 package org.logicng.solvers;
-
-import static org.logicng.datastructures.Tristate.TRUE;
-import static org.logicng.datastructures.Tristate.UNDEF;
 
 import org.logicng.cardinalityconstraints.CCEncoder;
 import org.logicng.cardinalityconstraints.CCIncrementalData;
@@ -71,6 +68,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import static org.logicng.datastructures.Tristate.FALSE;
+import static org.logicng.datastructures.Tristate.TRUE;
+import static org.logicng.datastructures.Tristate.UNDEF;
 
 /**
  * Wrapper for the MiniSAT-style SAT solvers.
@@ -558,5 +559,25 @@ public final class MiniSat extends SATSolver {
   @Override
   public String toString() {
     return String.format("MiniSat{result=%s, incremental=%s}", this.result, this.incremental);
+  }
+
+  private Literal getLiteralFromIntLiteral(final int lit) {
+    return this.f.literal(this.solver.nameForIdx(MiniSatStyleSolver.var(lit)), !MiniSatStyleSolver.sign(lit));
+  }
+
+  @Override
+  public SortedSet<Literal> upZeroLiterals() {
+    if (this.result == UNDEF) {
+      throw new IllegalStateException("Cannot get unit propagated literals on level 0 as long as the formula is not solved.  Call 'sat' first.");
+    }
+    if (this.result == FALSE) {
+      return null;
+    }
+    final LNGIntVector literals = this.solver.upZeroLiterals();
+    final SortedSet<Literal> upZeroLiterals = new TreeSet<Literal>();
+    for (int i = 0; i < literals.size(); ++i) {
+      upZeroLiterals.add(getLiteralFromIntLiteral(literals.get(i)));
+    }
+    return upZeroLiterals;
   }
 }

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -265,7 +265,7 @@ public class BDDOperationsTest {
   }
 
   @Test
-  public void testVariableProfil() {
+  public void testVariableProfile() {
     final Variable a = this.f.variable("A");
     final Variable b = this.f.variable("B");
     final Variable c = this.f.variable("C");

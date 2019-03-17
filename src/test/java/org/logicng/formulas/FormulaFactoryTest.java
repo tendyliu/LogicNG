@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -134,26 +134,26 @@ public class FormulaFactoryTest {
 
   @Test
   public void testCNF() {
-    FormulaFactory f = new FormulaFactory();
-    Variable a = f.variable("A");
-    Variable b = f.variable("B");
-    Variable c = f.variable("C");
-    Variable d = f.variable("D");
-    Formula clause1 = f.or(a, b);
-    Formula clause2 = f.or(c, d.negate());
-    Formula nClause1 = f.implication(a, c);
+    final FormulaFactory f = new FormulaFactory();
+    final Variable a = f.variable("A");
+    final Variable b = f.variable("B");
+    final Variable c = f.variable("C");
+    final Variable d = f.variable("D");
+    final Formula clause1 = f.or(a, b);
+    final Formula clause2 = f.or(c, d.negate());
+    final Formula nClause1 = f.implication(a, c);
 
-    List<Formula> clauses = new ArrayList<Formula>();
+    final List<Formula> clauses = new ArrayList<>();
     clauses.add(clause1);
     clauses.add(clause2);
 
-    List<Formula> nClauses = new ArrayList<Formula>();
+    final List<Formula> nClauses = new ArrayList<>();
     nClauses.add(clause1);
     nClauses.add(clause2);
     nClauses.add(nClause1);
 
-    Formula cnf = f.cnf(clauses);
-    Formula nCnf = f.cnf(nClauses);
+    final Formula cnf = f.cnf(clauses);
+    final Formula nCnf = f.cnf(nClauses);
     Assert.assertEquals(cnf, cnf.cnf());
     Assert.assertNotEquals(nCnf, nCnf.cnf());
   }
@@ -169,10 +169,13 @@ public class FormulaFactoryTest {
     assertThat(fg).isEqualTo(ff);
     assertThat(ff.factory()).isSameAs(f);
     assertThat(fg.factory()).isSameAs(g);
-    for (Literal litF : ff.literals()) {
+    assertThat(f.statistics()).isEqualToComparingOnlyGivenFields(g.statistics(), "positiveLiterals",
+            "negativeLiterals", "negations", "implications", "equivalences", "conjunctions2", "conjunctions3",
+            "conjunctions4", "conjunctionsN", "disjunctions2", "disjunctions3", "disjunctions4");
+    for (final Literal litF : ff.literals()) {
       assertThat(litF.factory()).isSameAs(f);
     }
-    for (Literal litG : fg.literals()) {
+    for (final Literal litG : fg.literals()) {
       assertThat(litG.factory()).isSameAs(g);
     }
   }

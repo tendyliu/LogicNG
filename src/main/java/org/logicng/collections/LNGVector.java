@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -123,7 +123,6 @@ public final class LNGVector<T> implements Iterable<T> {
    * Pushes an element at the end of the vector.
    * @param element the element
    */
-  @SuppressWarnings("unchecked")
   public void push(final T element) {
     int newSize = this.size + 1;
     this.ensure(newSize);

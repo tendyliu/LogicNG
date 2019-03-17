@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -28,6 +28,7 @@
 
 package org.logicng.functions;
 
+import org.logicng.formulas.FType;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFunction;
 import org.logicng.formulas.Literal;
@@ -60,7 +61,7 @@ public final class VariableProfileFunction implements FormulaFunction<Map<Variab
    * @return the variable profile
    */
   private static Map<Variable, Integer> nonCachingVariableProfile(final Formula formula) {
-    final SortedMap<Variable, Integer> map = new TreeMap<Variable, Integer>();
+    final SortedMap<Variable, Integer> map = new TreeMap<>();
     nonCachingRecursion(formula, map);
     return map;
   }
@@ -71,14 +72,14 @@ public final class VariableProfileFunction implements FormulaFunction<Map<Variab
    * @param map     the variable profile
    */
   private static void nonCachingRecursion(final Formula formula, final Map<Variable, Integer> map) {
-    if (formula instanceof Literal) {
+    if (formula.type() == FType.LITERAL) {
       final Literal lit = (Literal) formula;
       final Integer currentCount = map.get(lit.variable());
       if (currentCount == null)
         map.put(lit.variable(), 1);
       else
         map.put(lit.variable(), currentCount + 1);
-    } else if (formula instanceof PBConstraint)
+    } else if (formula.type() == FType.PBC)
       for (final Literal l : formula.literals())
         nonCachingRecursion(l.variable(), map);
     else
@@ -97,10 +98,10 @@ public final class VariableProfileFunction implements FormulaFunction<Map<Variab
     final Object cached = formula.functionCacheEntry(VARPROFILE);
     if (cached != null)
       return (Map<Variable, Integer>) cached;
-    Map<Variable, Integer> result = new HashMap<Variable, Integer>();
-    if (formula instanceof Literal)
+    Map<Variable, Integer> result = new HashMap<>();
+    if (formula.type() == FType.LITERAL)
       result.put(((Literal) formula).variable(), 1);
-    else if (formula instanceof PBConstraint)
+    else if (formula.type() == FType.PBC)
       for (final Literal l : formula.literals())
         result.put(l.variable(), 1);
     else

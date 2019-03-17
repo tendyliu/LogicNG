@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -56,10 +56,7 @@ public final class Implication extends BinaryOperator {
 
   @Override
   public Formula restrict(final Assignment assignment) {
-    Formula leftRestricted = left.restrict(assignment);
-    if (leftRestricted.type == FType.FALSE)
-      return f.verum();
-    return f.implication(leftRestricted, right.restrict(assignment));
+    return this.f.implication(this.left.restrict(assignment), this.right.restrict(assignment));
   }
 
   @Override

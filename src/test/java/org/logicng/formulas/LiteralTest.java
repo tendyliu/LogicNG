@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -156,6 +156,12 @@ public class LiteralTest {
   public void testNumberOfOperands() {
     Assert.assertEquals(0, F.A.numberOfOperands());
     Assert.assertEquals(0, F.NA.numberOfOperands());
+  }
+
+  @Test
+  public void testIsConstantFormula() {
+    Assert.assertFalse(F.A.isConstantFormula());
+    Assert.assertFalse(F.NA.isConstantFormula());
   }
 
   @Test

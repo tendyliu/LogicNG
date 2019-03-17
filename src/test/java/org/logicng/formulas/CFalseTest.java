@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -30,7 +30,6 @@ package org.logicng.formulas;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.logicng.io.parsers.ParserException;
 
 /**
  * Unit Tests for the class {@link CFalse}.
@@ -100,6 +99,12 @@ public class CFalseTest {
   @Test
   public void testNumberOfOperands() {
     Assert.assertEquals(0, F.FALSE.numberOfOperands());
+  }
+
+
+  @Test
+  public void testIsConstantFormula() {
+    Assert.assertTrue(F.FALSE.isConstantFormula());
   }
 
   @Test

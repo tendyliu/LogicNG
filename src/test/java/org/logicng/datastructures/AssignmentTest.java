@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -123,8 +123,8 @@ public class AssignmentTest {
     Assert.assertEquals(F.TRUE, ass.restrictLit(F.NX));
     Assert.assertEquals(F.FALSE, ass.restrictLit(F.NA));
     Assert.assertEquals(F.FALSE, ass.restrictLit(F.X));
-    Assert.assertEquals(null, ass.restrictLit(F.B));
-    Assert.assertEquals(null, ass.restrictLit(F.NB));
+    Assert.assertEquals(F.B, ass.restrictLit(F.B));
+    Assert.assertEquals(F.NB, ass.restrictLit(F.NB));
   }
 
   @Test
@@ -154,7 +154,7 @@ public class AssignmentTest {
     Assert.assertFalse(ass.evaluateLit(F.B));
     Assert.assertEquals(F.TRUE, ass.restrictLit(F.NB));
     Assert.assertEquals(F.FALSE, ass.restrictLit(F.X));
-    Assert.assertEquals(null, ass.restrictLit(F.C));
+    Assert.assertEquals(F.C, ass.restrictLit(F.C));
     Assert.assertEquals(F.f.and(F.A, F.NX, F.NB, F.Y), ass.formula(F.f));
     ass = new Assignment(Arrays.asList(F.A, F.NX), true);
     Assert.assertTrue(ass.fastEvaluable());
@@ -201,13 +201,19 @@ public class AssignmentTest {
     ass.addLiteral(F.B);
     ass.addLiteral(F.NX);
     ass.addLiteral(F.NY);
-    List<Literal> lits = new ArrayList<Literal>();
+    Formula bc01 = ass.blockingClause(F.f);
+    Assert.assertFalse(bc01.containsVariable(F.C));
+    Assert.assertEquals("~a | ~b | x | y", bc01.toString());
+    Formula bc02 = ass.blockingClause(F.f, null);
+    Assert.assertFalse(bc02.containsVariable(F.C));
+    Assert.assertEquals("~a | ~b | x | y", bc02.toString());
+    List<Literal> lits = new ArrayList<>();
     lits.add(F.A);
     lits.add(F.X);
     lits.add(F.C);
-    Formula bc = ass.blockingClause(F.f, lits);
-    Assert.assertTrue(!bc.containsVariable(F.C));
-    Assert.assertEquals("~a | x", bc.toString());
+    Formula bcProjected = ass.blockingClause(F.f, lits);
+    Assert.assertFalse(bcProjected.containsVariable(F.C));
+    Assert.assertEquals("~a | x", bcProjected.toString());
   }
 
   @Test

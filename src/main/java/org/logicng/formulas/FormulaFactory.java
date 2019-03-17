@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -27,13 +27,6 @@
 ///////////////////////////////////////////////////////////////////////////
 
 package org.logicng.formulas;
-
-import static org.logicng.formulas.FType.AND;
-import static org.logicng.formulas.FType.FALSE;
-import static org.logicng.formulas.FType.LITERAL;
-import static org.logicng.formulas.FType.NOT;
-import static org.logicng.formulas.FType.OR;
-import static org.logicng.formulas.FType.TRUE;
 
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
@@ -57,6 +50,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.logicng.formulas.FType.AND;
+import static org.logicng.formulas.FType.FALSE;
+import static org.logicng.formulas.FType.LITERAL;
+import static org.logicng.formulas.FType.NOT;
+import static org.logicng.formulas.FType.OR;
+import static org.logicng.formulas.FType.TRUE;
 
 /**
  * The formula factory for LogicNG.
@@ -1072,6 +1072,7 @@ public class FormulaFactory {
     statistics.disjunctions3 = this.ors3.size();
     statistics.disjunctions4 = this.ors4.size();
     statistics.disjunctionsN = this.orsN.size();
+    statistics.pbcs = this.pbConstraints.size();
     statistics.ccCounter = this.ccCounter;
     statistics.pbCounter = this.pbCounter;
     statistics.cnfCounter = this.cnfCounter;
@@ -1163,6 +1164,7 @@ public class FormulaFactory {
     private int disjunctions3;
     private int disjunctions4;
     private int disjunctionsN;
+    private int pbcs;
     private int ccCounter;
     private int pbCounter;
     private int cnfCounter;
@@ -1280,6 +1282,14 @@ public class FormulaFactory {
     }
 
     /**
+     * Returns the number of pseudo-Boolean constraints in the factory.
+     * @return the number of pseudo-Boolean constraints in the factory
+     */
+    public int pbcs() {
+      return this.pbcs;
+    }
+
+    /**
      * Returns the number of generated cardinality constraint auxiliary variables.
      * @return the number of generated cardinality constraint auxiliary variables
      */
@@ -1310,7 +1320,7 @@ public class FormulaFactory {
     public int formulas() {
       return this.positiveLiterals + this.negativeLiterals + this.negations + this.implications + this.equivalences
               + this.conjunctions2 + this.conjunctions3 + this.conjunctions4 + this.conjunctionsN + this.disjunctions2
-              + this.disjunctions3 + this.disjunctions4 + this.disjunctionsN;
+              + this.disjunctions3 + this.disjunctions4 + this.disjunctionsN + this.pbcs;
     }
 
     @Override
@@ -1330,12 +1340,11 @@ public class FormulaFactory {
               ", disjunctions3=" + this.disjunctions3 +
               ", disjunctions4=" + this.disjunctions4 +
               ", disjunctionsN=" + this.disjunctionsN +
+              ", pbcs=" + this.pbcs +
               ", ccCounter=" + this.ccCounter +
               ", pbCounter=" + this.pbCounter +
               ", cnfCounter=" + this.cnfCounter +
               '}';
     }
   }
-
-
 }

@@ -10,7 +10,7 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-//  Copyright 2015-2018 Christoph Zengler                                //
+//  Copyright 2015-20xx Christoph Zengler                                //
 //                                                                       //
 //  Licensed under the Apache License, Version 2.0 (the "License");      //
 //  you may not use this file except in compliance with the License.     //
@@ -69,18 +69,28 @@ public abstract class BinaryOperator extends Formula {
     return this.left;
   }
 
+  /**
+   * Returns the right-hand side operator.
+   * @return the right-hand side operator
+   */
+  public Formula right() {
+    return this.right;
+  }
+
   @Override
   public long numberOfAtoms() {
-    if (this.numberOfAtoms != -1)
+    if (this.numberOfAtoms != -1) {
       return this.numberOfAtoms;
+    }
     this.numberOfAtoms = this.left.numberOfAtoms() + this.right.numberOfAtoms();
     return this.numberOfAtoms;
   }
 
   @Override
   public long numberOfNodes() {
-    if (this.numberOfNodes != -1)
+    if (this.numberOfNodes != -1) {
       return this.numberOfNodes;
+    }
     this.numberOfNodes = this.left.numberOfNodes() + this.right.numberOfNodes() + 1;
     return this.numberOfNodes;
   }
@@ -88,6 +98,11 @@ public abstract class BinaryOperator extends Formula {
   @Override
   public int numberOfOperands() {
     return 2;
+  }
+
+  @Override
+  public boolean isConstantFormula() {
+    return false;
   }
 
   @Override
@@ -126,20 +141,12 @@ public abstract class BinaryOperator extends Formula {
 
   @Override
   public Formula substitute(final Substitution substitution) {
-    return f.binaryOperator(type, this.left.substitute(substitution), this.right.substitute(substitution));
+    return this.f.binaryOperator(this.type, this.left.substitute(substitution), this.right.substitute(substitution));
   }
 
   @Override
   public Formula negate() {
-    return f.not(this);
-  }
-
-  /**
-   * Returns the right-hand side operator.
-   * @return the right-hand side operator
-   */
-  public Formula right() {
-    return this.right;
+    return this.f.not(this);
   }
 
   @Override
@@ -149,17 +156,17 @@ public abstract class BinaryOperator extends Formula {
 
       @Override
       public boolean hasNext() {
-        return count < 2;
+        return this.count < 2;
       }
 
       @Override
       public Formula next() {
-        if (count == 0) {
-          count++;
-          return left;
-        } else if (count == 1) {
-          count++;
-          return right;
+        if (this.count == 0) {
+          this.count++;
+          return BinaryOperator.this.left;
+        } else if (this.count == 1) {
+          this.count++;
+          return BinaryOperator.this.right;
         }
         throw new NoSuchElementException();
       }
