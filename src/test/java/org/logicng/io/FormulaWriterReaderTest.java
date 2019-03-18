@@ -156,7 +156,7 @@ public class FormulaWriterReaderTest {
     final FormulaFactory f = new FormulaFactory();
     final Formula p1 = new PropositionalParser(f).parse("A & B & ~(C | (D => ~E))");
     FormulaWriter.write(fileName, p1, false, new UTF8StringRepresentation());
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
     try {
       Assert.assertEquals("A ∧ B ∧ ¬(C ∨ (D ⇒ ¬E))", reader.readLine());
     } finally {
@@ -172,7 +172,7 @@ public class FormulaWriterReaderTest {
     final FormulaFactory f = new FormulaFactory();
     final Formula p1 = new PropositionalParser(f).parse("A & B & ~(C | (D => ~E))");
     FormulaWriter.write(fileName, p1, true, new UTF8StringRepresentation());
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
     try {
       Assert.assertEquals("A", reader.readLine());
       Assert.assertEquals("B", reader.readLine());
