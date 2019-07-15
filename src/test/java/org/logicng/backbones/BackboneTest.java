@@ -160,6 +160,6 @@ public class BackboneTest {
   }
 
   private SortedSet<Variable> set(final Variable... variables) {
-    return new TreeSet<>(Arrays.asList(variables));
+    return new TreeSet<Variable>(Arrays.asList(variables));
   }
 }

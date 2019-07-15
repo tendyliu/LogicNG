@@ -35,7 +35,6 @@ import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
 
 import java.util.Collections;
-import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -158,7 +157,7 @@ public class Backbone {
    * @return the mapping of the backbone
    */
   public SortedMap<Variable, Tristate> toMap() {
-    final SortedMap<Variable, Tristate> map = new TreeMap<>();
+    final SortedMap<Variable, Tristate> map = new TreeMap<Variable, Tristate>();
     for (final Variable var : this.positiveBackbone) {
       map.put(var, Tristate.TRUE);
     }
@@ -172,25 +171,30 @@ public class Backbone {
   }
 
   @Override
-  public boolean equals(final Object other) {
-    if (other == null) {
-      return false;
-    }
-    if (this == other) {
+  public boolean equals(final Object o) {
+    if (this == o) {
       return true;
     }
-    if (getClass() != other.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    final Backbone backbone = (Backbone) other;
-    return Objects.equals(this.positiveBackbone, backbone.positiveBackbone) &&
-            Objects.equals(this.negativeBackbone, backbone.negativeBackbone) &&
-            Objects.equals(this.optionalVariables, backbone.optionalVariables);
+    final Backbone backbone = (Backbone) o;
+    if (!this.positiveBackbone.equals(backbone.positiveBackbone)) {
+      return false;
+    }
+    if (!this.negativeBackbone.equals(backbone.negativeBackbone)) {
+      return false;
+    }
+    return this.optionalVariables.equals(backbone.optionalVariables);
+
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.positiveBackbone, this.negativeBackbone, this.optionalVariables);
+    int result = this.positiveBackbone.hashCode();
+    result = 31 * result + this.negativeBackbone.hashCode();
+    result = 31 * result + this.optionalVariables.hashCode();
+    return result;
   }
 
   @Override

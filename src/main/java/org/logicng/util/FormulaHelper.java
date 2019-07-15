@@ -15,62 +15,62 @@ import java.util.TreeSet;
  */
 public class FormulaHelper {
 
-    /**
-     * Private empty constructor.  Class only contains static utility methods.
-     */
-    private FormulaHelper() {
-        // Intentionally left empty
-    }
+  /**
+   * Private empty constructor.  Class only contains static utility methods.
+   */
+  private FormulaHelper() {
+    // Intentionally left empty
+  }
 
-    /**
-     * Returns all variables occurring in the given formulas.
-     * @param formulas formulas
-     * @return all variables occurring in the given formulas
-     */
-    public static SortedSet<Variable> variables(Formula... formulas) {
-        SortedSet<Variable> variables = new TreeSet<>();
-        for (Formula f : formulas) {
-            variables.addAll(f.variables());
-        }
-        return variables;
+  /**
+   * Returns all variables occurring in the given formulas.
+   * @param formulas formulas
+   * @return all variables occurring in the given formulas
+   */
+  public static SortedSet<Variable> variables(final Formula... formulas) {
+    final SortedSet<Variable> variables = new TreeSet<Variable>();
+    for (final Formula f : formulas) {
+      variables.addAll(f.variables());
     }
+    return variables;
+  }
 
-    /**
-     * Returns all variables occurring in the given formulas.
-     * @param formulas formulas
-     * @return all variables occurring in the given formulas
-     */
-    public static SortedSet<Variable> variables(Collection<? extends Formula> formulas) {
-        SortedSet<Variable> variables = new TreeSet<>();
-        for (Formula f : formulas) {
-            variables.addAll(f.variables());
-        }
-        return variables;
+  /**
+   * Returns all variables occurring in the given formulas.
+   * @param formulas formulas
+   * @return all variables occurring in the given formulas
+   */
+  public static SortedSet<Variable> variables(final Collection<? extends Formula> formulas) {
+    final SortedSet<Variable> variables = new TreeSet<Variable>();
+    for (final Formula f : formulas) {
+      variables.addAll(f.variables());
     }
+    return variables;
+  }
 
-    /**
-     * Returns all literals occurring in the given formulas.
-     * @param formulas formulas
-     * @return all literals occurring in the given formulas
-     */
-    public static SortedSet<Literal> literals(Formula... formulas) {
-        SortedSet<Literal> literals = new TreeSet<>();
-        for (Formula f : formulas) {
-            literals.addAll(f.literals());
-        }
-        return literals;
+  /**
+   * Returns all literals occurring in the given formulas.
+   * @param formulas formulas
+   * @return all literals occurring in the given formulas
+   */
+  public static SortedSet<Literal> literals(final Formula... formulas) {
+    final SortedSet<Literal> literals = new TreeSet<Literal>();
+    for (final Formula f : formulas) {
+      literals.addAll(f.literals());
     }
+    return literals;
+  }
 
-    /**
-     * Returns all literals occurring in the given formulas.
-     * @param formulas formulas
-     * @return all literals occurring in the given formulas
-     */
-    public static SortedSet<Literal> literals(Collection<? extends Formula> formulas) {
-        SortedSet<Literal> literals = new TreeSet<>();
-        for (Formula f : formulas) {
-            literals.addAll(f.literals());
-        }
-        return literals;
+  /**
+   * Returns all literals occurring in the given formulas.
+   * @param formulas formulas
+   * @return all literals occurring in the given formulas
+   */
+  public static SortedSet<Literal> literals(final Collection<? extends Formula> formulas) {
+    final SortedSet<Literal> literals = new TreeSet<Literal>();
+    for (final Formula f : formulas) {
+      literals.addAll(f.literals());
     }
+    return literals;
+  }
 }

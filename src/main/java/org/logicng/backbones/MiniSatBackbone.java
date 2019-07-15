@@ -152,7 +152,7 @@ public class MiniSatBackbone extends MiniSat2Solver {
    * @return list of relevant variable indices
    */
   private List<Integer> getRelevantVarIndices(final Collection<Variable> variables) {
-    final List<Integer> relevantVarIndices = new ArrayList<>(variables.size());
+    final List<Integer> relevantVarIndices = new ArrayList<Integer>(variables.size());
     for (final Variable var : variables) {
       final Integer idx = this.name2idx.get(var.name());
       // Note: Unknown variables are variables added to the solver yet. Thus, these are optional variables and can
@@ -171,9 +171,9 @@ public class MiniSatBackbone extends MiniSat2Solver {
    */
   private void init(final List<Integer> variables, final BackboneType type) {
     this.type = type;
-    this.candidates = new Stack<>();
+    this.candidates = new Stack<Integer>();
     this.assumptions = new LNGIntVector(variables.size());
-    this.backboneMap = new HashMap<>();
+    this.backboneMap = new HashMap<Integer, Tristate>();
     for (final Integer var : variables) {
       this.backboneMap.put(var, Tristate.UNDEF);
     }
@@ -343,7 +343,7 @@ public class MiniSatBackbone extends MiniSat2Solver {
    * Refines the upper bound by optional checks (UP zero literal, complement model literal, rotatable literal).
    */
   private void refineUpperBound() {
-    for (final Integer lit : new ArrayList<>(this.candidates)) {
+    for (final Integer lit : new ArrayList<Integer>(this.candidates)) {
       final int var = var(lit);
       if (isUPZeroLit(var)) {
         this.candidates.remove(lit);
