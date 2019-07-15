@@ -30,6 +30,7 @@ package org.logicng.formulas;
 
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Substitution;
+import org.logicng.util.FormulaHelper;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,13 +40,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
 
 /**
  * Super class for Boolean n-ary operators.
- * @version 1.1
+ * @version 1.5.1
  * @since 1.0
  */
 public abstract class NAryOperator extends Formula {
@@ -67,21 +67,25 @@ public abstract class NAryOperator extends Formula {
 
   @Override
   public long numberOfAtoms() {
-    if (this.numberOfAtoms != -1)
+    if (this.numberOfAtoms != -1) {
       return this.numberOfAtoms;
+    }
     this.numberOfAtoms = 0;
-    for (final Formula f : this.operands)
+    for (final Formula f : this.operands) {
       this.numberOfAtoms += f.numberOfAtoms();
+    }
     return this.numberOfAtoms;
   }
 
   @Override
   public long numberOfNodes() {
-    if (this.numberOfNodes != -1)
+    if (this.numberOfNodes != -1) {
       return this.numberOfNodes;
+    }
     this.numberOfNodes = 1;
-    for (final Formula f : this.operands)
+    for (final Formula f : this.operands) {
       this.numberOfNodes += f.numberOfNodes();
+    }
     return this.numberOfNodes;
   }
 
@@ -103,55 +107,57 @@ public abstract class NAryOperator extends Formula {
   @Override
   public SortedSet<Variable> variables() {
     if (this.variables == null) {
-      final SortedSet<Variable> set = new TreeSet<Variable>();
-      for (final Formula op : this.operands)
-        set.addAll(op.variables());
-      this.variables = Collections.unmodifiableSortedSet(set);
+      this.variables = Collections.unmodifiableSortedSet(FormulaHelper.variables(operands));
     }
     return this.variables;
   }
 
   @Override
   public SortedSet<Literal> literals() {
-    final SortedSet<Literal> set = new TreeSet<Literal>();
-    for (final Formula op : this.operands)
-      set.addAll(op.literals());
-    return Collections.unmodifiableSortedSet(set);
+    return Collections.unmodifiableSortedSet(FormulaHelper.literals(operands));
   }
 
   @Override
   public boolean containsVariable(final Variable variable) {
-    for (final Formula op : this.operands)
-      if (op.containsVariable(variable))
+    for (final Formula op : this.operands) {
+      if (op.containsVariable(variable)) {
         return true;
+      }
+    }
     return false;
   }
 
   @Override
   public Formula restrict(final Assignment assignment) {
     final LinkedHashSet<Formula> nops = new LinkedHashSet<Formula>();
-    for (final Formula op : this.operands)
+    for (final Formula op : this.operands) {
       nops.add(op.restrict(assignment));
+    }
     return this.f.naryOperator(this.type, nops);
   }
 
   @Override
   public boolean containsNode(final Formula formula) {
-    if (this.equals(formula))
+    if (this.equals(formula)) {
       return true;
+    }
     if (this.type != formula.type) {
-      for (final Formula op : this.operands)
-        if (op.containsNode(formula))
+      for (final Formula op : this.operands) {
+        if (op.containsNode(formula)) {
           return true;
+        }
+      }
       return false;
     }
     final List<Formula> fOps = new ArrayList<Formula>(formula.numberOfOperands());
-    for (final Formula op : formula)
+    for (final Formula op : formula) {
       fOps.add(op);
+    }
     for (final Formula op : this.operands) {
       fOps.remove(op);
-      if (op.containsNode(formula))
+      if (op.containsNode(formula)) {
         return true;
+      }
     }
     return fOps.isEmpty();
   }
@@ -159,8 +165,9 @@ public abstract class NAryOperator extends Formula {
   @Override
   public Formula substitute(final Substitution substitution) {
     final LinkedHashSet<Formula> nops = new LinkedHashSet<Formula>();
-    for (final Formula op : this.operands)
+    for (final Formula op : this.operands) {
       nops.add(op.substitute(substitution));
+    }
     return this.f.naryOperator(this.type, nops);
   }
 
@@ -174,8 +181,9 @@ public abstract class NAryOperator extends Formula {
     Formula nnf = this.transformationCache.get(NNF);
     if (nnf == null) {
       final LinkedHashSet<Formula> nops = new LinkedHashSet<Formula>();
-      for (final Formula op : this.operands)
+      for (final Formula op : this.operands) {
         nops.add(op.nnf());
+      }
       nnf = this.f.naryOperator(this.type, nops);
       this.transformationCache.put(NNF, nnf);
     }
@@ -190,8 +198,9 @@ public abstract class NAryOperator extends Formula {
   protected int hashCode(final int shift) {
     if (this.hashCode == 0) {
       int temp = 1;
-      for (final Formula formula : this.operands)
+      for (final Formula formula : this.operands) {
         temp += formula.hashCode();
+      }
       temp *= shift;
       this.hashCode = temp;
     }
@@ -210,8 +219,9 @@ public abstract class NAryOperator extends Formula {
 
       @Override
       public Formula next() {
-        if (this.i == NAryOperator.this.operands.length)
+        if (this.i == NAryOperator.this.operands.length) {
           throw new NoSuchElementException();
+        }
         return NAryOperator.this.operands[this.i++];
       }
 

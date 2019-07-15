@@ -29,16 +29,16 @@
 package org.logicng.formulas;
 
 import org.logicng.datastructures.Substitution;
+import org.logicng.util.FormulaHelper;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * Super class for Boolean binary operators.
- * @version 1.2
+ * @version 1.5.1
  * @since 1.0
  */
 public abstract class BinaryOperator extends Formula {
@@ -113,20 +113,14 @@ public abstract class BinaryOperator extends Formula {
   @Override
   public SortedSet<Variable> variables() {
     if (this.variables == null) {
-      final SortedSet<Variable> set = new TreeSet<Variable>();
-      set.addAll(this.left.variables());
-      set.addAll(this.right.variables());
-      this.variables = Collections.unmodifiableSortedSet(set);
+      this.variables = Collections.unmodifiableSortedSet(FormulaHelper.variables(left, right));
     }
     return this.variables;
   }
 
   @Override
   public SortedSet<Literal> literals() {
-    final SortedSet<Literal> set = new TreeSet<Literal>();
-    set.addAll(this.left.literals());
-    set.addAll(this.right.literals());
-    return Collections.unmodifiableSortedSet(set);
+    return Collections.unmodifiableSortedSet(FormulaHelper.literals(left, right));
   }
 
   @Override

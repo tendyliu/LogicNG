@@ -34,6 +34,7 @@ import org.logicng.collections.LNGVector;
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Substitution;
 import org.logicng.datastructures.Tristate;
+import org.logicng.util.FormulaHelper;
 import org.logicng.util.Pair;
 
 import java.util.Arrays;
@@ -46,14 +47,13 @@ import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import static org.logicng.formulas.cache.TransformationCacheEntry.NNF;
 
 /**
  * A pseudo-Boolean constraint of the form {@code c_1 * l_1 + ... + c_n * l_n R k} where {@code R} is one of
  * {@code =, >, >=, <, <=}.
- * @version 1.3
+ * @version 1.5.1
  * @since 1.0
  */
 public final class PBConstraint extends Formula {
@@ -418,19 +418,14 @@ public final class PBConstraint extends Formula {
   @Override
   public SortedSet<Variable> variables() {
     if (this.variables == null) {
-      this.variables = new TreeSet<Variable>();
-      for (final Literal lit : this.literals)
-        this.variables.add(lit.variable());
-      this.variables = Collections.unmodifiableSortedSet(this.variables);
+      this.variables = Collections.unmodifiableSortedSet(FormulaHelper.variables(literals));
     }
     return this.variables;
   }
 
   @Override
   public SortedSet<Literal> literals() {
-    final SortedSet<Literal> lits = new TreeSet<Literal>();
-    Collections.addAll(lits, this.literals);
-    return Collections.unmodifiableSortedSet(lits);
+    return Collections.unmodifiableSortedSet(FormulaHelper.literals(literals));
   }
 
   @Override

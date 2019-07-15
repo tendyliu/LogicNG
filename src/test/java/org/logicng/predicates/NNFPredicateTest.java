@@ -26,69 +26,46 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-package org.logicng.bdds.orderings;
+package org.logicng.predicates;
 
-import org.logicng.formulas.BinaryOperator;
-import org.logicng.formulas.Formula;
-import org.logicng.formulas.Literal;
-import org.logicng.formulas.Not;
-import org.logicng.formulas.PBConstraint;
-import org.logicng.formulas.Variable;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import org.junit.Assert;
+import org.junit.Test;
+import org.logicng.formulas.F;
 
 /**
- * A breadth-first-search BDD variable ordering.  Traverses the formula in a BFS manner
- * and gathers all variables in the occurrence.
- * @version 1.4.0
- * @since 1.4.0
+ * Unit tests for the nnf predicate.
+ * @version 1.5.1
+ * @since 1.5.1
  */
-public class BFSOrdering implements VariableOrderingProvider {
+public class NNFPredicateTest {
 
-  @Override
-  public List<Variable> getOrder(final Formula formula) {
-    return new ArrayList<Variable>(bfs(formula));
-  }
+    private final NNFPredicate nnfPredicate = new NNFPredicate();
 
-  private LinkedHashSet<Variable> bfs(final Formula formula) {
-    final LinkedHashSet<Variable> variables = new LinkedHashSet<Variable>();
-    final Queue<Formula> queue = new LinkedList<Formula>();
-    queue.add(formula);
-    while (!queue.isEmpty()) {
-      final Formula current = queue.remove();
-      switch (current.type()) {
-        case LITERAL:
-          final Literal lit = (Literal) current;
-          if (lit.phase())
-            variables.add(lit.variable());
-          else
-            queue.add(lit.variable());
-          break;
-        case NOT:
-          queue.add(((Not) current).operand());
-          break;
-        case IMPL:
-        case EQUIV:
-          final BinaryOperator op = (BinaryOperator) current;
-          queue.add(op.left());
-          queue.add(op.right());
-          break;
-        case AND:
-        case OR:
-          for (final Formula operand : current)
-            queue.add(operand);
-          break;
-        case PBC:
-          final PBConstraint pbc = (PBConstraint) current;
-          for (final Literal literal : pbc.operands())
-            variables.add(literal.variable());
-          break;
-      }
+    @Test
+    public void test() {
+        Assert.assertTrue(F.f.verum().holds(nnfPredicate));
+        Assert.assertTrue(F.f.falsum().holds(nnfPredicate));
+        Assert.assertTrue(F.A.holds(nnfPredicate));
+        Assert.assertTrue(F.NA.holds(nnfPredicate));
+        Assert.assertTrue(F.OR1.holds(nnfPredicate));
+        Assert.assertTrue(F.AND1.holds(nnfPredicate));
+        Assert.assertTrue(F.AND3.holds(nnfPredicate));
+        Assert.assertTrue(F.f.and(F.OR1, F.OR2, F.A, F.NY).holds(nnfPredicate));
+        Assert.assertTrue(F.f.and(F.OR1, F.OR2, F.AND1, F.AND2, F.AND3, F.A, F.NY).holds(nnfPredicate));
+        Assert.assertTrue(F.OR3.holds(nnfPredicate));
+        Assert.assertFalse(F.PBC1.holds(nnfPredicate));
+        Assert.assertFalse(F.IMP1.holds(nnfPredicate));
+        Assert.assertFalse(F.EQ1.holds(nnfPredicate));
+        Assert.assertFalse(F.NOT1.holds(nnfPredicate));
+        Assert.assertFalse(F.NOT2.holds(nnfPredicate));
+        Assert.assertFalse(F.f.and(F.OR1, F.f.not(F.OR2), F.A, F.NY).holds(nnfPredicate));
+        Assert.assertFalse(F.f.and(F.OR1, F.EQ1).holds(nnfPredicate));
+        Assert.assertFalse(F.f.and(F.OR1, F.IMP1, F.AND1).holds(nnfPredicate));
+        Assert.assertFalse(F.f.and(F.OR1, F.PBC1, F.AND1).holds(nnfPredicate));
     }
-    return variables;
-  }
+
+    @Test
+    public void testToString() {
+        Assert.assertEquals("NNFPredicate", nnfPredicate.toString());
+    }
 }

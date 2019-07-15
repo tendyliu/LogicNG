@@ -39,7 +39,7 @@ import java.util.List;
 
 /**
  * Unit tests for the package formulas.cache.
- * @version 1.3
+ * @version 1.5.1
  * @since 1.1
  */
 public class CacheTest {
@@ -69,7 +69,9 @@ public class CacheTest {
     Assert.assertTrue(valuesTrans.contains(TransformationCacheEntry.valueOf("PLAISTED_GREENBAUM_NEG")));
 
     final List<PredicateCacheEntry> valuesPred = Arrays.asList(PredicateCacheEntry.values());
-    Assert.assertEquals(5, valuesPred.size());
+    Assert.assertEquals(6, valuesPred.size());
+    Assert.assertTrue(valuesPred.contains(PredicateCacheEntry.valueOf("IS_NNF")));
+    Assert.assertTrue(valuesPred.contains(PredicateCacheEntry.valueOf("IS_CNF")));
     Assert.assertTrue(valuesPred.contains(PredicateCacheEntry.valueOf("IS_DNF")));
     Assert.assertTrue(valuesPred.contains(PredicateCacheEntry.valueOf("IS_SAT")));
 

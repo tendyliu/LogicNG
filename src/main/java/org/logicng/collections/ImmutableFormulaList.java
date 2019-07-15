@@ -36,6 +36,7 @@ import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
 import org.logicng.functions.LiteralProfileFunction;
 import org.logicng.functions.VariableProfileFunction;
+import org.logicng.util.FormulaHelper;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,11 +47,10 @@ import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * A list of formulas.  This can represent the operands of an n-ary operator, a CNF, a DNF, a constraint, etc.
- * @version 1.0
+ * @version 1.5.1
  * @since 1.0
  */
 public final class ImmutableFormulaList implements Iterable<Formula> {
@@ -210,9 +210,7 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
    */
   public SortedSet<Variable> variables() {
     if (this.variables == null) {
-      this.variables = new TreeSet<Variable>();
-      for (final Formula f : this.formulas)
-        this.variables.addAll(f.variables());
+      this.variables = FormulaHelper.variables(formulas);
     }
     return this.variables;
   }
@@ -222,10 +220,7 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
    * @return all literals occurring in this formula list
    */
   public SortedSet<Literal> literals() {
-    final SortedSet<Literal> literals = new TreeSet<Literal>();
-    for (final Formula f : this.formulas)
-      literals.addAll(f.literals());
-    return literals;
+    return FormulaHelper.literals(formulas);
   }
 
   /**
@@ -298,7 +293,6 @@ public final class ImmutableFormulaList implements Iterable<Formula> {
     result = 31 * result + Arrays.hashCode(formulas);
     return result;
   }
-
 
   @Override
   public boolean equals(final Object other) {
