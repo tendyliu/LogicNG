@@ -28,26 +28,46 @@
 
 package org.logicng.solvers.sat;
 
+import static org.logicng.solvers.sat.MiniSatConfig.CNFMethod.FACTORY_CNF;
+import static org.logicng.solvers.sat.MiniSatConfig.ClauseMinimization.DEEP;
+
 import org.logicng.configurations.Configuration;
 import org.logicng.configurations.ConfigurationType;
-
-import static org.logicng.solvers.sat.MiniSatConfig.ClauseMinimization.DEEP;
+import org.logicng.formulas.Formula;
+import org.logicng.solvers.SATSolver;
 
 /**
  * The configuration object for a MiniSAT-style SAT solver.
- * @version 1.3
+ * @version 1.6
  * @since 1.0
  */
 public final class MiniSatConfig extends Configuration {
 
   /**
    * The different methods for clause minimization.
-   * {@code NONE} - no minimization is performed
-   * {@code BASIC} - local minimization is performed
-   * {@code DEEP} - recursive minimization is performed
+   * <ul>
+   * <li> {@code NONE} - no minimization is performed
+   * <li> {@code BASIC} - local minimization is performed
+   * <li> {@code DEEP} - recursive minimization is performed
+   * </ul>
    */
   public enum ClauseMinimization {
     NONE, BASIC, DEEP
+  }
+
+  /**
+   * The different methods for generating a CNF for a formula to put on the solver.
+   * <ul>
+   * <li> {@code FACTORY_CNF} calls the {@link Formula#cnf()} method on the formula
+   * to convert it to CNF.  Therefore the CNF including all its auxiliary variables will
+   * be added to the formula factory.
+   * <li> {@code PG_ON_SOLVER} uses a solver-internal implementation of Plaisted-Greenbaum.
+   * Auxiliary variables are only added on the solver, not on the factory.  This usually
+   * leads to a reduced heap usage and often faster performance.
+   * </ul>
+   */
+  public enum CNFMethod {
+    FACTORY_CNF, PG_ON_SOLVER
   }
 
   final double varDecay;
@@ -62,6 +82,8 @@ public final class MiniSatConfig extends Configuration {
   final boolean incremental;
   final boolean initialPhase;
   final boolean proofGeneration;
+  final CNFMethod cnfMethod;
+  final boolean auxiliaryVariablesInModels;
 
   /**
    * Constructs a new MiniSAT configuration from a given builder.
@@ -81,6 +103,8 @@ public final class MiniSatConfig extends Configuration {
     this.incremental = builder.incremental;
     this.initialPhase = builder.initialPhase;
     this.proofGeneration = builder.proofGeneration;
+    this.cnfMethod = builder.cnfMethod;
+    this.auxiliaryVariablesInModels = builder.auxiliaryVariablesInModels;
   }
 
   /**
@@ -107,6 +131,22 @@ public final class MiniSatConfig extends Configuration {
     return this.proofGeneration;
   }
 
+  /**
+   * Returns the CNF method which should be used.
+   * @return the CNF method
+   */
+  public CNFMethod getCnfMethod() {
+    return this.cnfMethod;
+  }
+
+  /**
+   * Returns whether auxiliary Variables should be included in the model or not.
+   * @return whether auxiliary Variables should be included in the model or not
+   */
+  public boolean isAuxiliaryVariablesInModels() {
+    return this.auxiliaryVariablesInModels;
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("MiniSatConfig{").append(String.format("%n"));
@@ -122,6 +162,8 @@ public final class MiniSatConfig extends Configuration {
     sb.append("incremental=").append(this.incremental).append(String.format("%n"));
     sb.append("initialPhase=").append(this.initialPhase).append(String.format("%n"));
     sb.append("proofGeneration=").append(this.proofGeneration).append(String.format("%n"));
+    sb.append("cnfMethod=").append(this.cnfMethod).append(String.format("%n"));
+    sb.append("auxiliaryVariablesInModels=").append(this.auxiliaryVariablesInModels).append(String.format("%n"));
     sb.append("}").append(String.format("%n"));
     return sb.toString();
   }
@@ -142,13 +184,15 @@ public final class MiniSatConfig extends Configuration {
     private boolean incremental = true;
     private boolean initialPhase = false;
     private boolean proofGeneration = false;
+    CNFMethod cnfMethod = FACTORY_CNF;
+    boolean auxiliaryVariablesInModels = true;
 
     /**
      * Sets the variable activity decay factor to a given value. The default value is 0.95.
      * @param varDecay the value (should be in the range 0..1)
      * @return the builder
      */
-    public Builder varDecay(double varDecay) {
+    public Builder varDecay(final double varDecay) {
       this.varDecay = varDecay;
       return this;
     }
@@ -159,7 +203,7 @@ public final class MiniSatConfig extends Configuration {
      * @param varInc the value
      * @return the builder
      */
-    public Builder varInc(double varInc) {
+    public Builder varInc(final double varInc) {
       this.varInc = varInc;
       return this;
     }
@@ -179,7 +223,7 @@ public final class MiniSatConfig extends Configuration {
      * @param restartFirst the value (should be at least 1)
      * @return the builder
      */
-    public Builder restartFirst(int restartFirst) {
+    public Builder restartFirst(final int restartFirst) {
       this.restartFirst = restartFirst;
       return this;
     }
@@ -189,7 +233,7 @@ public final class MiniSatConfig extends Configuration {
      * @param restartInc the value (should be at least 1)
      * @return the builder
      */
-    public Builder restartInc(double restartInc) {
+    public Builder restartInc(final double restartInc) {
       this.restartInc = restartInc;
       return this;
     }
@@ -199,7 +243,7 @@ public final class MiniSatConfig extends Configuration {
      * @param clauseDecay the value (should be in the range 0..1)
      * @return the builder
      */
-    public Builder clauseDecay(double clauseDecay) {
+    public Builder clauseDecay(final double clauseDecay) {
       this.clauseDecay = clauseDecay;
       return this;
     }
@@ -210,7 +254,7 @@ public final class MiniSatConfig extends Configuration {
      * @param removeSatisfied {@code true} if the original clauses should be simplified, {@code false} otherwise
      * @return the builder
      */
-    public Builder removeSatisfied(boolean removeSatisfied) {
+    public Builder removeSatisfied(final boolean removeSatisfied) {
       this.removeSatisfied = removeSatisfied;
       return this;
     }
@@ -221,7 +265,7 @@ public final class MiniSatConfig extends Configuration {
      * @param learntsizeFactor the value
      * @return the builder
      */
-    public Builder lsFactor(double learntsizeFactor) {
+    public Builder lsFactor(final double learntsizeFactor) {
       this.learntsizeFactor = learntsizeFactor;
       return this;
     }
@@ -232,7 +276,7 @@ public final class MiniSatConfig extends Configuration {
      * @param learntsizeInc the value
      * @return the builder
      */
-    public Builder lsInc(double learntsizeInc) {
+    public Builder lsInc(final double learntsizeInc) {
       this.learntsizeInc = learntsizeInc;
       return this;
     }
@@ -242,7 +286,7 @@ public final class MiniSatConfig extends Configuration {
      * @param incremental {@code true} if incremental mode is turned on, {@code false} otherwise
      * @return the builder
      */
-    public Builder incremental(boolean incremental) {
+    public Builder incremental(final boolean incremental) {
       this.incremental = incremental;
       return this;
     }
@@ -252,18 +296,45 @@ public final class MiniSatConfig extends Configuration {
      * @param initialPhase the initial phase
      * @return the builder
      */
-    public Builder initialPhase(boolean initialPhase) {
+    public Builder initialPhase(final boolean initialPhase) {
       this.initialPhase = initialPhase;
       return this;
     }
 
     /**
-     * Sets whether the information for generating a proof with DRUP should be recorded or not.
+     * Sets whether the information for generating a proof with DRUP should be recorded or not.  The default
+     * value is {@code false}.
      * @param proofGeneration {@code true} if proof generating information should be recorded, {@code false} otherwise
      * @return the builder
      */
-    public Builder proofGeneration(boolean proofGeneration) {
+    public Builder proofGeneration(final boolean proofGeneration) {
       this.proofGeneration = proofGeneration;
+      return this;
+    }
+
+    /**
+     * Sets the CNF method for converting formula which are not in CNF for the solver.  The default value
+     * is {@code FACTORY_CNF}.
+     * @param cnfMethod the CNF method
+     * @return the builder
+     */
+    public Builder cnfMethod(final CNFMethod cnfMethod) {
+      this.cnfMethod = cnfMethod;
+      return this;
+    }
+
+    /**
+     * Sets whether auxiliary variables (CNF, cardinality constraints, pseudo-Boolean constraints) should
+     * be included in methods like {@link SATSolver#model()} or {@link SATSolver#enumerateAllModels()}.  If
+     * set to {@code true}, all variables will be included in these methods,  if set to {@code false}, variables
+     * starting with "@RESERVED_CC_", "@RESERVED_PB_", and "@RESERVED_CNF_" will be excluded from the models.
+     * The default value is {@code true}.
+     * @param auxiliaryVariablesInModels {@code true} if auxiliary variables should be included in the models,
+     *                                   {@code false} otherwise
+     * @return the builder
+     */
+    public Builder auxiliaryVariablesInModels(final boolean auxiliaryVariablesInModels) {
+      this.auxiliaryVariablesInModels = auxiliaryVariablesInModels;
       return this;
     }
 
