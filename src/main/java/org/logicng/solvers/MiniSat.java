@@ -32,6 +32,8 @@ import static org.logicng.datastructures.Tristate.FALSE;
 import static org.logicng.datastructures.Tristate.TRUE;
 import static org.logicng.datastructures.Tristate.UNDEF;
 
+import org.logicng.backbones.Backbone;
+import org.logicng.backbones.BackboneType;
 import org.logicng.cardinalityconstraints.CCEncoder;
 import org.logicng.cardinalityconstraints.CCIncrementalData;
 import org.logicng.collections.LNGBooleanVector;
@@ -371,11 +373,11 @@ public final class MiniSat extends SATSolver {
     }
     LNGIntVector relevantAllIndices = null;
     if (relevantIndices != null) {
-      if(additionalVariables.isEmpty()) {
+      if (additionalVariables.isEmpty()) {
         relevantAllIndices = relevantIndices;
       } else {
         relevantAllIndices = new LNGIntVector(relevantIndices.size() + additionalVariables.size());
-        for(int i = 0; i < relevantIndices.size(); ++i) {
+        for (int i = 0; i < relevantIndices.size(); ++i) {
           relevantAllIndices.push(relevantIndices.get(i));
         }
         for (final Variable var : additionalVariables) {
@@ -516,6 +518,19 @@ public final class MiniSat extends SATSolver {
     return new UNSATCore<Proposition>(new ArrayList<Proposition>(propositions), false);
   }
 
+  @Override
+  public Backbone backbone(final Collection<Variable> relevantVariables, final BackboneType type) {
+    SolverState stateBeforeBackbone = null;
+    if (this.style == SolverStyle.MINISAT && this.incremental) {
+      stateBeforeBackbone = this.saveState();
+    }
+    final Backbone backbone = this.solver.computeBackbone(relevantVariables, type);
+    if (this.style == SolverStyle.MINISAT && this.incremental) {
+      loadState(stateBeforeBackbone);
+    }
+    return backbone;
+  }
+
   /**
    * Generates a clause vector of a collection of literals.
    * @param literals the literals
@@ -628,7 +643,7 @@ public final class MiniSat extends SATSolver {
 
   @Override
   public String toString() {
-    return String.format("MiniSat{result=%s, incremental=%s}", this.result, this.incremental);
+    return String.format("%s{result=%s, incremental=%s}", this.solver.getClass().getSimpleName(), this.result, this.incremental);
   }
 
   private Literal getLiteralFromIntLiteral(final int lit) {
@@ -653,5 +668,9 @@ public final class MiniSat extends SATSolver {
 
   private boolean lastResultIsUsable() {
     return this.result != UNDEF && !this.lastComputationWithAssumptions;
+  }
+
+  public MiniSatConfig getConfig() {
+    return this.config;
   }
 }
