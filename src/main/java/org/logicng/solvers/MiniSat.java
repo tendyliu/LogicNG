@@ -682,9 +682,9 @@ public final class MiniSat extends SATSolver {
 
   @Override
   public Set<Formula> formulaOnSolver() {
-    final Set<Formula> formulas = new LinkedHashSet<>();
+    final Set<Formula> formulas = new LinkedHashSet<Formula>();
     for (final MSClause clause : this.underlyingSolver().clauses()) {
-      final List<Literal> lits = new ArrayList<>();
+      final List<Literal> lits = new ArrayList<Literal>();
       for (int i = 0; i < clause.size(); i++) {
         final int litInt = clause.get(i);
         lits.add(this.f.literal(this.solver.nameForIdx(litInt >> 1), (litInt & 1) != 1));
@@ -693,7 +693,7 @@ public final class MiniSat extends SATSolver {
         formulas.add(this.f.clause(lits));
       } else {
         final int rhs = clause.size() + 1 - clause.atMostWatchers();
-        final List<Variable> vars = new ArrayList<>();
+        final List<Variable> vars = new ArrayList<Variable>();
         for (final Literal lit : lits) {
           vars.add(lit.variable());
         }

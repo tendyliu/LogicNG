@@ -933,7 +933,7 @@ public class SATTest {
     for (final SATSolver solver : this.solvers) {
       if (solver instanceof MiniSat) {
         final PseudoBooleanParser p = new PseudoBooleanParser(this.f);
-        final Set<Formula> formulas = new LinkedHashSet<>();
+        final Set<Formula> formulas = new LinkedHashSet<Formula>();
         formulas.add(p.parse("A | B | C"));
         formulas.add(p.parse("~A | ~B | ~C"));
         formulas.add(p.parse("A | ~B"));
@@ -953,7 +953,7 @@ public class SATTest {
   }
 
   private void compareFormulas(final Collection<Formula> original, final Collection<Formula> solver) {
-    final SortedSet<Variable> vars = new TreeSet<>();
+    final SortedSet<Variable> vars = new TreeSet<Variable>();
     for (final Formula formula : original) {
       vars.addAll(formula.variables());
     }
