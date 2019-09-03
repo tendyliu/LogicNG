@@ -60,6 +60,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -419,5 +420,10 @@ public final class CleaneLing extends SATSolver {
             upZeroLiterals.add(getLiteralFromIntLiteral(literals.get(i)));
         }
         return upZeroLiterals;
+    }
+
+    @Override
+    public Set<Formula> formulaOnSolver() {
+        throw new UnsupportedOperationException("The CleaneLing solver does not support returning the formula on the solver");
     }
 }

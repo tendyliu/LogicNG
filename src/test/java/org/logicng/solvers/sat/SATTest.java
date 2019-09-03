@@ -52,6 +52,7 @@ import org.logicng.handlers.NumberOfModelsHandler;
 import org.logicng.handlers.TimeoutSATHandler;
 import org.logicng.io.parsers.ParserException;
 import org.logicng.io.parsers.PropositionalParser;
+import org.logicng.io.parsers.PseudoBooleanParser;
 import org.logicng.propositions.StandardProposition;
 import org.logicng.solvers.CleaneLing;
 import org.logicng.solvers.MiniSat;
@@ -67,10 +68,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -922,5 +926,43 @@ public class SATTest {
       }
       solver.reset();
     }
+  }
+
+  @Test
+  public void testFormulaOnSolver() throws ParserException {
+    for (final SATSolver solver : this.solvers) {
+      if (solver instanceof MiniSat) {
+        final PseudoBooleanParser p = new PseudoBooleanParser(this.f);
+        final Set<Formula> formulas = new LinkedHashSet<>();
+        formulas.add(p.parse("A | B | C"));
+        formulas.add(p.parse("~A | ~B | ~C"));
+        formulas.add(p.parse("A | ~B"));
+        formulas.add(p.parse("A"));
+        solver.add(formulas);
+        compareFormulas(formulas, solver.formulaOnSolver());
+        formulas.add(p.parse("~A | C"));
+        solver.reset();
+        solver.add(formulas);
+        compareFormulas(formulas, solver.formulaOnSolver());
+        final Formula formula = p.parse("C + D + E <= 2");
+        formulas.add(formula);
+        solver.add(formula);
+        compareFormulas(formulas, solver.formulaOnSolver());
+      }
+    }
+  }
+
+  private void compareFormulas(final Collection<Formula> original, final Collection<Formula> solver) {
+    final SortedSet<Variable> vars = new TreeSet<>();
+    for (final Formula formula : original) {
+      vars.addAll(formula.variables());
+    }
+    final MiniSat miniSat = MiniSat.miniSat(this.f);
+    miniSat.add(original);
+    final List<Assignment> models1 = miniSat.enumerateAllModels(vars);
+    miniSat.reset();
+    miniSat.add(solver);
+    final List<Assignment> models2 = miniSat.enumerateAllModels(vars);
+    assertThat(models1).containsOnlyElementsOf(models2);
   }
 }

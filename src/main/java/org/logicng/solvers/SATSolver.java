@@ -47,6 +47,7 @@ import org.logicng.propositions.Proposition;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 
 /**
@@ -495,4 +496,10 @@ public abstract class SATSolver {
     public FormulaFactory factory() {
         return this.f;
     }
+
+    /**
+     * Returns the formula which is currently stored on the solver.
+     * @return the formula on the solver
+     */
+    public abstract Set<Formula> formulaOnSolver();
 }

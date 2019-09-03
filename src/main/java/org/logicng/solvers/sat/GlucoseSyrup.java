@@ -313,7 +313,7 @@ public final class GlucoseSyrup extends MiniSatStyleSolver {
       status = search();
     }
 
-    if (this.config.proofGeneration) {
+    if (this.config.proofGeneration && this.assumptions.empty()) {
       if (status == Tristate.FALSE) {
         this.pgProof.push(new LNGIntVector(1, 0));
       }

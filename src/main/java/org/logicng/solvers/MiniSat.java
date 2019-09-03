@@ -55,6 +55,8 @@ import org.logicng.handlers.ModelEnumerationHandler;
 import org.logicng.handlers.SATHandler;
 import org.logicng.propositions.Proposition;
 import org.logicng.propositions.StandardProposition;
+import org.logicng.solvers.datastructures.MSClause;
+import org.logicng.solvers.datastructures.MSVariable;
 import org.logicng.solvers.sat.GlucoseConfig;
 import org.logicng.solvers.sat.GlucoseSyrup;
 import org.logicng.solvers.sat.MiniCard;
@@ -75,6 +77,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import static org.logicng.datastructures.Tristate.FALSE;
+import static org.logicng.datastructures.Tristate.TRUE;
+import static org.logicng.datastructures.Tristate.UNDEF;
 
 /**
  * Wrapper for the MiniSAT-style SAT solvers.
@@ -672,5 +678,35 @@ public final class MiniSat extends SATSolver {
 
   public MiniSatConfig getConfig() {
     return this.config;
+  }
+
+  @Override
+  public Set<Formula> formulaOnSolver() {
+    final Set<Formula> formulas = new LinkedHashSet<>();
+    for (final MSClause clause : this.underlyingSolver().clauses()) {
+      final List<Literal> lits = new ArrayList<>();
+      for (int i = 0; i < clause.size(); i++) {
+        final int litInt = clause.get(i);
+        lits.add(this.f.literal(this.solver.nameForIdx(litInt >> 1), (litInt & 1) != 1));
+      }
+      if (!clause.isAtMost()) {
+        formulas.add(this.f.clause(lits));
+      } else {
+        final int rhs = clause.size() + 1 - clause.atMostWatchers();
+        final List<Variable> vars = new ArrayList<>();
+        for (final Literal lit : lits) {
+          vars.add(lit.variable());
+        }
+        formulas.add(this.f.cc(CType.LE, rhs, vars));
+      }
+    }
+    final LNGVector<MSVariable> variables = this.solver.variables();
+    for (int i = 0; i < variables.size(); i++) {
+      final MSVariable var = variables.get(i);
+      if (var.level() == 0) {
+        formulas.add(this.f.literal(this.solver.nameForIdx(i), var.assignment() == TRUE));
+      }
+    }
+    return formulas;
   }
 }

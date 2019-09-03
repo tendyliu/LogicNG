@@ -993,4 +993,12 @@ public abstract class MiniSatStyleSolver {
   private boolean isBothType(final BackboneType type) {
     return type == BackboneType.POSITIVE_AND_NEGATIVE;
   }
+
+  public LNGVector<MSClause> clauses() {
+    return this.clauses;
+  }
+
+  public LNGVector<MSVariable> variables() {
+    return this.vars;
+  }
 }

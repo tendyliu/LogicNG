@@ -212,7 +212,7 @@ public class MiniSat2Solver extends MiniSatStyleSolver {
       currRestarts++;
     }
 
-    if (this.config.proofGeneration) {
+    if (this.config.proofGeneration && this.assumptions.empty()) {
       if (status == Tristate.FALSE) {
         this.pgProof.push(new LNGIntVector(1, 0));
       }
@@ -760,5 +760,4 @@ public class MiniSat2Solver extends MiniSatStyleSolver {
     this.watches.get(not(c.get(0))).remove(new MSWatcher(c, c.get(1)));
     this.watches.get(not(c.get(1))).remove(new MSWatcher(c, c.get(0)));
   }
-
 }
