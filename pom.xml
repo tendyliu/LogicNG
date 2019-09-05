@@ -27,6 +27,7 @@
   <groupId>org.logicng</groupId>
   <artifactId>logicng-j6</artifactId>
   <version>1.6.0</version>
+>>>>>>>>> Temporary merge branch 2
   <packaging>jar</packaging>
 
   <name>LogicNG</name>

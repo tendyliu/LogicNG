@@ -89,6 +89,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import static org.logicng.formulas.FType.AND;
+
 /**
  * The factory for the jBuddy implementation.
  * @version 1.4.0
