@@ -28,12 +28,22 @@
 
 package org.logicng.transformations.cnf;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.logicng.datastructures.Assignment;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
+import org.logicng.formulas.Variable;
 import org.logicng.io.parsers.ParserException;
 import org.logicng.io.parsers.PropositionalParser;
+import org.logicng.predicates.CNFPredicate;
+import org.logicng.solvers.MiniSat;
+import org.logicng.solvers.SATSolver;
+
+import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Unit tests for the class {@link CNFEncoder}.
@@ -41,6 +51,8 @@ import org.logicng.io.parsers.PropositionalParser;
  * @since 1.1
  */
 public class CNFEncoderTest {
+
+  private static final CNFPredicate cnfPredicate = new CNFPredicate();
 
   private static final String p1 = "(x1 | x2) & x3 & x4 & ((x1 & x5 & ~(x6 | x7) | x8) | x9)";
   private static final String p2 = "(y1 | y2) & y3 & y4 & ((y1 & y5 & ~(y6 | y7) | y8) | y9)";
@@ -57,7 +69,7 @@ public class CNFEncoderTest {
     Assert.assertEquals(p.parse("(x1 | x2) & x3 & x4 & (x1 | x8 | x9) & (x5 | x8 | x9) & (~x6 | x8 | x9) & (~x7 | x8 | x9)"), phi1.cnf());
     f.putConfiguration(new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.FACTORIZATION).build());
     Assert.assertEquals(p.parse("(x1 | x2) & x3 & x4 & (x1 | x8 | x9) & (x5 | x8 | x9) & (~x6 | x8 | x9) & (~x7 | x8 | x9)"), phi1.cnf());
-    CNFEncoder encoder = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.FACTORIZATION).build());
+    final CNFEncoder encoder = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.FACTORIZATION).build());
     Assert.assertEquals(p.parse("(x1 | x2) & x3 & x4 & (x1 | x8 | x9) & (x5 | x8 | x9) & (~x6 | x8 | x9) & (~x7 | x8 | x9)"), encoder.encode(phi1));
   }
 
@@ -122,9 +134,9 @@ public class CNFEncoderTest {
     final FormulaFactory f = new FormulaFactory();
     final PropositionalParser p = new PropositionalParser(f);
     final Formula phi1 = p.parse(p1);
-    CNFEncoder encoder1 = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.TSEITIN).build());
+    final CNFEncoder encoder1 = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.TSEITIN).build());
     Assert.assertEquals(p.parse("(x1 | x2) & x3 & x4 & (x1 | x8 | x9) & (x5 | x8 | x9) & (~x6 | x8 | x9) & (~x7 | x8 | x9)"), encoder1.encode(phi1));
-    CNFEncoder encoder2 = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.TSEITIN).atomBoundary(8).build());
+    final CNFEncoder encoder2 = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.TSEITIN).atomBoundary(8).build());
     Assert.assertEquals(p.parse("(@RESERVED_CNF_0 | ~x1) & (@RESERVED_CNF_0 | ~x2) & (~@RESERVED_CNF_0 | x1 | x2) & (~@RESERVED_CNF_1 | x1) & (~@RESERVED_CNF_1 | x5) & (~@RESERVED_CNF_1 | ~x6) & (~@RESERVED_CNF_1 | ~x7) & (@RESERVED_CNF_1 | ~x1 | ~x5 | x6 | x7) & (@RESERVED_CNF_2 | ~@RESERVED_CNF_1) & (@RESERVED_CNF_2 | ~x8) & (@RESERVED_CNF_2 | ~x9) & (~@RESERVED_CNF_2 | @RESERVED_CNF_1 | x8 | x9) & @RESERVED_CNF_0 & x3 & x4 & @RESERVED_CNF_2"), encoder2.encode(phi1));
   }
 
@@ -133,10 +145,29 @@ public class CNFEncoderTest {
     final FormulaFactory f = new FormulaFactory();
     final PropositionalParser p = new PropositionalParser(f);
     final Formula phi1 = p.parse(p1);
-    CNFEncoder encoder1 = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.PLAISTED_GREENBAUM).build());
+    final CNFEncoder encoder1 = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.PLAISTED_GREENBAUM).build());
     Assert.assertEquals(p.parse("(x1 | x2) & x3 & x4 & (x1 | x8 | x9) & (x5 | x8 | x9) & (~x6 | x8 | x9) & (~x7 | x8 | x9)"), encoder1.encode(phi1));
-    CNFEncoder encoder2 = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.PLAISTED_GREENBAUM).atomBoundary(8).build());
+    final CNFEncoder encoder2 = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.PLAISTED_GREENBAUM).atomBoundary(8).build());
     Assert.assertEquals(p.parse("@RESERVED_CNF_1 & x3 & x4 & @RESERVED_CNF_2 & (~@RESERVED_CNF_1 | x1 | x2) & (~@RESERVED_CNF_2 | @RESERVED_CNF_3 | x8 | x9) & (~@RESERVED_CNF_3 | x1) & (~@RESERVED_CNF_3 | x5) & (~@RESERVED_CNF_3 | ~x6) & (~@RESERVED_CNF_3 | ~x7)"), encoder2.encode(phi1));
+  }
+
+  @Test
+  public void testBDDEncoder() throws ParserException {
+    final FormulaFactory f = new FormulaFactory();
+    final PropositionalParser p = new PropositionalParser(f);
+    final Formula phi1 = p.parse(p1);
+    final Formula phi2 = p.parse(p2);
+    final Formula phi3 = p.parse(p3);
+    final CNFEncoder encoder = new CNFEncoder(f, new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.BDD).build());
+    final Formula phi1CNF = encoder.encode(phi1);
+    assertThat(phi1CNF.holds(cnfPredicate)).isTrue();
+    assertThat(equivalentModels(phi1, phi1CNF, phi1.variables())).isTrue();
+    final Formula phi2CNF = encoder.encode(phi2);
+    assertThat(phi2CNF.holds(cnfPredicate)).isTrue();
+    assertThat(equivalentModels(phi2, phi2CNF, phi2.variables())).isTrue();
+    final Formula phi3CNF = encoder.encode(phi3);
+    assertThat(phi3CNF.holds(cnfPredicate)).isTrue();
+    assertThat(equivalentModels(phi3, phi3CNF, phi3.variables())).isTrue();
   }
 
   @Test
@@ -146,26 +177,26 @@ public class CNFEncoderTest {
     final Formula phi1 = p.parse(p1);
     final Formula phi2 = p.parse(p2);
     final Formula phi3 = p.parse(p3);
-    CNFEncoder encoder1 = new CNFEncoder(f, new CNFConfig.Builder().build());
+    final CNFEncoder encoder1 = new CNFEncoder(f, new CNFConfig.Builder().build());
     Assert.assertEquals(p.parse("(x1 | x2) & x3 & x4 & (x1 | x8 | x9) & (x5 | x8 | x9) & (~x6 | x8 | x9) & (~x7 | x8 | x9)"), encoder1.encode(phi1));
-    CNFEncoder encoder2 = new CNFEncoder(f, new CNFConfig.Builder().createdClauseBoundary(5).atomBoundary(3).build());
+    final CNFEncoder encoder2 = new CNFEncoder(f, new CNFConfig.Builder().createdClauseBoundary(5).atomBoundary(3).build());
     Assert.assertEquals(p.parse("(y1 | y2) & y3 & y4 & (~@RESERVED_CNF_0 | y1) & (~@RESERVED_CNF_0 | y5) & (~@RESERVED_CNF_0 | ~y6) & (~@RESERVED_CNF_0 | ~y7) & (@RESERVED_CNF_0 | ~y1 | ~y5 | y6 | y7) & (@RESERVED_CNF_0 | y8 | y9)"), encoder2.encode(phi2));
-    CNFEncoder encoder3 = new CNFEncoder(f, new CNFConfig.Builder().createdClauseBoundary(-1).distributionBoundary(5).atomBoundary(3).build());
+    final CNFEncoder encoder3 = new CNFEncoder(f, new CNFConfig.Builder().createdClauseBoundary(-1).distributionBoundary(5).atomBoundary(3).build());
     Assert.assertEquals(p.parse("(z1 | z2) & z3 & z4 & (~@RESERVED_CNF_2 | z1) & (~@RESERVED_CNF_2 | z5) & (~@RESERVED_CNF_2 | ~z6) & (~@RESERVED_CNF_2 | ~z7) & (@RESERVED_CNF_2 | ~z1 | ~z5 | z6 | z7) & (@RESERVED_CNF_2 | z8 | z9)"), encoder3.encode(phi3));
   }
 
   @Test
   public void testStrings() {
-    String expected = String.format("CNFConfig{%n" +
+    final String expected = String.format("CNFConfig{%n" +
             "algorithm=TSEITIN%n" +
             "fallbackAlgorithmForAdvancedEncoding=PLAISTED_GREENBAUM%n" +
             "distributedBoundary=-1%n" +
             "createdClauseBoundary=1000%n" +
             "atomBoundary=12%n" +
             "}%n");
-    FormulaFactory f = new FormulaFactory();
-    CNFConfig config = new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.TSEITIN).fallbackAlgorithmForAdvancedEncoding(CNFConfig.Algorithm.PLAISTED_GREENBAUM).build();
-    CNFEncoder encoder = new CNFEncoder(f, config);
+    final FormulaFactory f = new FormulaFactory();
+    final CNFConfig config = new CNFConfig.Builder().algorithm(CNFConfig.Algorithm.TSEITIN).fallbackAlgorithmForAdvancedEncoding(CNFConfig.Algorithm.PLAISTED_GREENBAUM).build();
+    final CNFEncoder encoder = new CNFEncoder(f, config);
     Assert.assertEquals(expected, config.toString());
     Assert.assertEquals(expected, encoder.toString());
     Assert.assertEquals(CNFConfig.Algorithm.TSEITIN, CNFConfig.Algorithm.valueOf("TSEITIN"));
@@ -188,4 +219,21 @@ public class CNFEncoderTest {
     new CNFConfig.Builder().fallbackAlgorithmForAdvancedEncoding(CNFConfig.Algorithm.FACTORIZATION).build();
   }
 
+  private boolean equivalentModels(final Formula f1, final Formula f2, final SortedSet<Variable> vars) {
+    final SATSolver s = MiniSat.miniSat(f1.factory());
+    s.add(f1);
+    final List<Assignment> models1 = s.enumerateAllModels(vars);
+    s.reset();
+    s.add(f2);
+    final List<Assignment> models2 = s.enumerateAllModels(vars);
+    if (models1.size() != models2.size()) {
+      return false;
+    }
+    for (final Assignment model : models1) {
+      if (!models2.contains(model)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
