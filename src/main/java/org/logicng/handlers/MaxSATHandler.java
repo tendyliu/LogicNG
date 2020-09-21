@@ -32,7 +32,7 @@ import org.logicng.datastructures.Assignment;
 
 /**
  * Interface for a handler for MaxSAT solvers.
- * @version 1.6.2
+ * @version 2.1.0
  * @since 1.0
  */
 public interface MaxSATHandler extends Handler {
@@ -42,6 +42,11 @@ public interface MaxSATHandler extends Handler {
      * @return a SAT handler
      */
     SATHandler satHandler();
+
+    @Override
+    default boolean aborted() {
+        return satHandler() != null && satHandler().aborted();
+    }
 
     /**
      * This method is called when the MaxSAT solver found a new lower bound for a solution.
@@ -60,15 +65,11 @@ public interface MaxSATHandler extends Handler {
     boolean foundUpperBound(final int upperBound, final Assignment model);
 
     /**
-     * This method is called every time the SAT solver finished.
-     * @return whether more models should be searched or not
-     */
-    boolean satSolverFinished();
-
-    /**
      * This method is called when the MaxSAT solver finished solving.
      */
-    void finishedSolving();
+    default void finishedSolving() {
+
+    }
 
     /**
      * Returns the last approximation of the result or -1 if there is no approximation for the lower bound.

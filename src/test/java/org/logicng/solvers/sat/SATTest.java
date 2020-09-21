@@ -324,12 +324,6 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
                         this.aborted = assignment.negativeLiterals().isEmpty();
                         return !this.aborted;
                     }
-
-                    @Override
-                    public boolean satSolverFinished() {
-                        // nothing to do here
-                        return true;
-                    }
                 };
                 final List<Assignment> models = s.execute(ModelEnumerationFunction.builder().handler(handler).build());
                 assertThat(models.isEmpty()).isFalse();
@@ -613,7 +607,7 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
 
             solver.add(this.f.exo(variables));
             TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(50L);
-            solver.execute(ModelEnumerationFunction.builder().handler(handler).build());
+            System.out.println(solver.execute(ModelEnumerationFunction.builder().handler(handler).build()).size());
             assertThat(handler.aborted()).isTrue();
             solver.reset();
 

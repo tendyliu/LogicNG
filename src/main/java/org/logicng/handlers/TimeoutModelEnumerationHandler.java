@@ -32,7 +32,7 @@ import org.logicng.datastructures.Assignment;
 
 /**
  * A model enumeration handler which cancels the computation process after a given timeout.
- * @version 1.6.2
+ * @version 2.1.0
  * @since 1.0
  */
 public class TimeoutModelEnumerationHandler extends TimeoutHandler implements ModelEnumerationHandler {
@@ -52,8 +52,15 @@ public class TimeoutModelEnumerationHandler extends TimeoutHandler implements Mo
 
     @Override
     public SATHandler satHandler() {
-        this.satHandler = new TimeoutSATHandler(remainingTime());
+        if (this.satHandler == null) {
+            this.satHandler = new TimeoutSATHandler(remainingTime());
+        }
         return this.satHandler;
+    }
+
+    @Override
+    public boolean aborted() {
+        return super.aborted() || ModelEnumerationHandler.super.aborted();
     }
 
     /**
@@ -68,11 +75,5 @@ public class TimeoutModelEnumerationHandler extends TimeoutHandler implements Mo
     @Override
     public boolean foundModel(final Assignment assignment) {
         return timeLimitExceeded();
-    }
-
-    @Override
-    public boolean satSolverFinished() {
-        this.aborted = this.satHandler.aborted();
-        return !this.aborted;
     }
 }

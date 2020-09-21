@@ -64,6 +64,11 @@ public final class TimeoutMaxSATHandler extends TimeoutHandler implements MaxSAT
     }
 
     @Override
+    public boolean aborted() {
+        return super.aborted() || this.satHandler.aborted();
+    }
+
+    @Override
     public SATHandler satHandler() {
         return this.satHandler;
     }
@@ -78,12 +83,6 @@ public final class TimeoutMaxSATHandler extends TimeoutHandler implements MaxSAT
     public boolean foundUpperBound(final int upperBound, final Assignment model) {
         this.currentUb = upperBound;
         return timeLimitExceeded();
-    }
-
-    @Override
-    public boolean satSolverFinished() {
-        this.aborted = this.satHandler.aborted();
-        return !this.aborted;
     }
 
     @Override

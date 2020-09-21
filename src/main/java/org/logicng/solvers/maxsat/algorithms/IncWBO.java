@@ -346,7 +346,6 @@ public class IncWBO extends WBO {
                 }
             }
             final Tristate res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-            satSolverFinished();
             if (res == UNDEF) {
                 return MaxSATResult.UNDEF;
             } else if (res == FALSE) {
@@ -444,7 +443,6 @@ public class IncWBO extends WBO {
                 }
             }
             final Tristate res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-            satSolverFinished();
             if (res == UNDEF) {
                 return MaxSATResult.UNDEF;
             } else if (res == FALSE) {

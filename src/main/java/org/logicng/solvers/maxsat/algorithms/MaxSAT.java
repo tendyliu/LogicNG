@@ -447,10 +447,6 @@ public abstract class MaxSAT {
         return this.handler == null || this.handler.foundUpperBound(upperBound, model);
     }
 
-    boolean satSolverFinished() {
-        return this.handler == null || this.handler.satSolverFinished();
-    }
-
     /**
      * The MaxSAT solver statistics.
      */

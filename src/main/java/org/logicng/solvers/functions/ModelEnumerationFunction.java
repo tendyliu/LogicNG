@@ -150,7 +150,7 @@ public final class ModelEnumerationFunction implements SolverFunction<List<Assig
             return solver.sat((SATHandler) null) == TRUE;
         }
         final Tristate tristate = solver.sat(handler.satHandler());
-        return handler.satSolverFinished() && tristate == TRUE;
+        return !handler.aborted() && tristate == TRUE;
     }
 
     /**

@@ -32,7 +32,7 @@ package org.logicng.handlers;
  * Interface for a handler.  A handler can be used as callback for different time-intensive computations in order
  * to abort these computations.  There are same often used default handlers already implemented and users can
  * implement their own handlers by implementing the respective interfaces.
- * @version 1.6.2
+ * @version 2.1.0
  * @since 1.6.2
  */
 public interface Handler {
@@ -41,10 +41,22 @@ public interface Handler {
      * Returns whether the computation was aborted by the handler.
      * @return {@code true} if the computation was aborted by the handler, otherwise {@code false}
      */
-    boolean aborted();
+    default boolean aborted() {
+        return false;
+    }
+
+//    /**
+//     * Returns whether any child of this handler (another Handler used by this Handler) was aborted.
+//     * @return {@code true} if any child computation was aborted, otherwise {@code false}
+//     */
+//    default boolean childrenAborted() {
+//        return false;
+//    }
 
     /**
      * This method is called when the computation starts.
      */
-    void started();
+    default void started() {
+
+    }
 }

@@ -180,7 +180,6 @@ public class WMSU3 extends MaxSAT {
         final LNGIntVector fullCoeffsFunction = new LNGIntVector();
         while (true) {
             res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-            satSolverFinished();
             if (res == UNDEF) {
                 return MaxSATResult.UNDEF;
             } else if (res == TRUE) {
@@ -275,7 +274,6 @@ public class WMSU3 extends MaxSAT {
         this.assumptions.clear();
         while (true) {
             res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-            satSolverFinished();
             if (res == UNDEF) {
                 return MaxSATResult.UNDEF;
             } else if (res == TRUE) {
@@ -375,7 +373,6 @@ public class WMSU3 extends MaxSAT {
         firstEncoding.push(true);
         while (true) {
             res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-            satSolverFinished();
             if (res == UNDEF) {
                 return MaxSATResult.UNDEF;
             } else if (res == TRUE) {
