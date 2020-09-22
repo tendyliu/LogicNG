@@ -43,14 +43,19 @@ public class TimeoutOptimizationHandler extends TimeoutHandler implements Optimi
     private Supplier<Assignment> lastModelProvider;
 
     /**
-     * Constructs a new instance with a given timeout in milliseconds.
+     * Constructs a new instance with a given timeout or designated end in milliseconds.
+     * If designated end is &gt; 0, the timeout will be ignored and multiple calls to {@link #started()}
+     * will not change the time limit.
+     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillies() + timeout}
+     * on every call to {@link #started()}.
      * <p>
      * Note that it might take a few milliseconds more until the computation is actually
      * canceled, since the handler depends on the next found model.
-     * @param timeout the timeout in milliseconds
+     * @param timeout       the timeout in milliseconds, ignored if designated end is &gt; 0
+     * @param designatedEnd the designated end time in milliseconds (definition as in {@link System#currentTimeMillis()})
      */
-    public TimeoutOptimizationHandler(final long timeout) {
-        super(timeout, -1);
+    public TimeoutOptimizationHandler(final long timeout, final long designatedEnd) {
+        super(timeout, designatedEnd);
     }
 
     /**
@@ -72,7 +77,6 @@ public class TimeoutOptimizationHandler extends TimeoutHandler implements Optimi
     public void started() {
         super.started();
         this.satHandler = new TimeoutSATHandler(-1, this.designatedEnd);
-        this.satHandler.started();
         this.lastModelProvider = null;
     }
 

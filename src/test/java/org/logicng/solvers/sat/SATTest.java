@@ -589,7 +589,7 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
     public void testTimeoutModelEnumerationHandlerWithUNSATInstance() {
         for (final SATSolver solver : this.solvers) {
             solver.add(this.pg.generate(10));
-            final TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(1000L);
+            final TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(1000L, 0L);
             final List<Assignment> assignments = solver.execute(ModelEnumerationFunction.builder().handler(handler).build());
             assertThat(assignments).isEmpty();
             assertThat(handler.aborted()).isTrue();
@@ -606,13 +606,13 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
             }
 
             solver.add(this.f.exo(variables));
-            TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(50L);
+            TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(50L, 0L);
             solver.execute(ModelEnumerationFunction.builder().handler(handler).build());
             assertThat(handler.aborted()).isTrue();
             solver.reset();
 
             solver.add(this.f.exo(variables.subList(0, 5)));
-            handler = new TimeoutModelEnumerationHandler(1000L);
+            handler = new TimeoutModelEnumerationHandler(1000L, 0L);
             final List<Assignment> assignments = solver.execute(ModelEnumerationFunction.builder().handler(handler).build());
             assertThat(assignments).hasSize(5);
             assertThat(handler.aborted()).isFalse();

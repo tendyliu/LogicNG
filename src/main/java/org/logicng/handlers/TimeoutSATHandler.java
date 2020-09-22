@@ -36,12 +36,16 @@ package org.logicng.handlers;
 public final class TimeoutSATHandler extends TimeoutHandler implements SATHandler {
 
     /**
-     * Constructs a new instance with a given timeout in milliseconds.
+     * Constructs a new instance with a given timeout or designated end in milliseconds.
+     * If designated end is &gt; 0, the timeout will be ignored and multiple calls to {@link #started()}
+     * will not change the time limit.
+     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillies() + timeout}
+     * on every call to {@link #started()}.
      * <p>
      * Note that it might take a few milliseconds more until the sat solver is actually
      * canceled, since the handler depends on the solvers call to {@code detectedConflict()}.
-     * @param timeout       the timeout in milliseconds
-     * @param designatedEnd the designated end
+     * @param timeout       the timeout in milliseconds, ignored if designated end is &gt; 0
+     * @param designatedEnd the designated end time in milliseconds (definition as in {@link System#currentTimeMillis()})
      */
     public TimeoutSATHandler(final long timeout, final long designatedEnd) {
         super(timeout, designatedEnd);
