@@ -44,15 +44,7 @@ public interface Handler {
     default boolean aborted() {
         return false;
     }
-
-//    /**
-//     * Returns whether any child of this handler (another Handler used by this Handler) was aborted.
-//     * @return {@code true} if any child computation was aborted, otherwise {@code false}
-//     */
-//    default boolean childrenAborted() {
-//        return false;
-//    }
-
+    
     /**
      * This method is called when the computation starts.
      */

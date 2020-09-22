@@ -47,29 +47,29 @@ public class TimeoutModelEnumerationHandler extends TimeoutHandler implements Mo
      * @param timeout the timeout in milliseconds
      */
     public TimeoutModelEnumerationHandler(final long timeout) {
-        super(timeout);
+        super(timeout, -1);
     }
 
+    /**
+     * Returns a SAT handler which can be used to cancel internal SAT calls of the model enumeration process.
+     * Note that this handler will only be available after the first call to {@link #started()}.
+     * @return the SAT handler
+     */
     @Override
     public SATHandler satHandler() {
-        if (this.satHandler == null) {
-            this.satHandler = new TimeoutSATHandler(remainingTime());
-        }
         return this.satHandler;
     }
 
     @Override
     public boolean aborted() {
-        return super.aborted() || ModelEnumerationHandler.super.aborted();
+        return super.aborted() || this.satHandler != null && this.satHandler.aborted();
     }
 
-    /**
-     * Returns the remaining time until the designated end.
-     * @return the remaining time in milliseconds
-     */
-    private long remainingTime() {
-        final long remainingTime = this.designatedEnd - System.currentTimeMillis();
-        return remainingTime >= 0 ? remainingTime : 0L;
+    @Override
+    public void started() {
+        super.started();
+        this.satHandler = new TimeoutSATHandler(-1, this.designatedEnd);
+        this.satHandler.started();
     }
 
     @Override

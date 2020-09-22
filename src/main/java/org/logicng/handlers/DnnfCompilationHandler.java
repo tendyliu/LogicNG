@@ -42,10 +42,4 @@ public interface DnnfCompilationHandler extends Handler {
     default boolean shannonExpansion() {
         return true;
     }
-
-    /**
-     * This method is called when the computation ends.
-     */
-    default void end() {
-    }
 }

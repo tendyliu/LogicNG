@@ -39,6 +39,8 @@ import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
+import org.logicng.handlers.OptimizationHandler;
+import org.logicng.handlers.SATHandler;
 import org.logicng.solvers.MiniSat;
 import org.logicng.solvers.SolverState;
 
@@ -54,10 +56,11 @@ import java.util.function.Consumer;
 /**
  * A solver function for computing a model for the formula on the solver
  * which has a global minimum or maximum of satisfied literals. If the formula
- * is UNSAT, {@code null} will be returned.
+ * is UNSAT or the optimization handler aborted the computation, {@code null}
+ * will be returned.
  * <p>
  * Optimization functions are instantiated via their builder {@link #builder()}.
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public final class OptimizationFunction implements SolverFunction<Assignment> {
@@ -67,14 +70,16 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
     private final Collection<? extends Literal> literals;
     private final SortedSet<Variable> resultModelVariables;
     private final boolean maximize;
+    private final OptimizationHandler handler;
 
-    private OptimizationFunction(final Collection<? extends Literal> literals, final Collection<Variable> additionalVariables, final boolean maximize) {
+    private OptimizationFunction(final Collection<? extends Literal> literals, final Collection<Variable> additionalVariables, final boolean maximize, final OptimizationHandler handler) {
         this.literals = literals;
         this.resultModelVariables = new TreeSet<>(additionalVariables);
         for (final Literal lit : literals) {
             this.resultModelVariables.add(lit.variable());
         }
         this.maximize = maximize;
+        this.handler = handler;
     }
 
     /**
@@ -117,6 +122,13 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
     }
 
     private Assignment maximize(final MiniSat solver) {
+        final SATHandler satHandler;
+        if (this.handler != null) {
+            this.handler.started();
+            satHandler = this.handler.satHandler();
+        } else {
+            satHandler = null;
+        }
         final FormulaFactory f = solver.factory();
         LNGBooleanVector internalModel;
         final Map<Variable, Literal> selectorMap = new TreeMap<>();
@@ -153,14 +165,30 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
         final Formula cc = f.cc(CType.GE, currentBound + 1, selectors);
         assert cc instanceof CardinalityConstraint;
         final CCIncrementalData incrementalData = solver.addIncrementalCC((CardinalityConstraint) cc);
-        while (solver.sat() == Tristate.TRUE) {
-            internalModel = solver.underlyingSolver().model();
+        Tristate sat = solver.sat(satHandler);
+        while (sat == Tristate.TRUE) {
+            final LNGBooleanVector internalFinalModel = solver.underlyingSolver().model();
+            // TODO: this is the better implementation, but the content of internalFinalModel is lost at the end
+//            if (this.handler != null && !this.handler.foundBetterBound(() -> mkResultModel(solver, new LNGBooleanVector(internalFinalModel)))) {
+//                return null;
+//            }
+            if (this.handler != null) {
+                final Assignment assignment = mkResultModel(solver, new LNGBooleanVector(internalFinalModel));
+                if (!this.handler.foundBetterBound(() -> assignment)) {
+                    return null;
+                }
+            }
+            internalModel = internalFinalModel;
             currentModel = solver.model(selectors);
             currentBound = currentModel.positiveVariables().size();
             if (currentBound == selectors.size()) {
                 return mkResultModel(solver, internalModel);
             }
             incrementalData.newLowerBoundForSolver(currentBound + 1);
+            sat = solver.sat(satHandler);
+        }
+        if (sat == Tristate.UNDEF) {
+            return null;
         }
         return mkResultModel(solver, internalModel);
     }
@@ -180,6 +208,7 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
         private Collection<? extends Literal> literals;
         private Collection<Variable> additionalVariables = new TreeSet<>();
         private boolean maximize = true;
+        private OptimizationHandler handler = null;
 
         private Builder() {
             // Initialize only via factory
@@ -244,11 +273,21 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
         }
 
         /**
+         * Sets the handler for the optimization.
+         * @param handler the handler
+         * @return the current builder
+         */
+        public Builder handler(final OptimizationHandler handler) {
+            this.handler = handler;
+            return this;
+        }
+
+        /**
          * Builds the optimization function with the current builder's configuration.
          * @return the optimization function
          */
         public OptimizationFunction build() {
-            return new OptimizationFunction(this.literals, this.additionalVariables, this.maximize);
+            return new OptimizationFunction(this.literals, this.additionalVariables, this.maximize, this.handler);
         }
     }
 }

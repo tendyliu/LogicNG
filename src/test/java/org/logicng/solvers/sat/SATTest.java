@@ -493,7 +493,7 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
     public void testTimeoutSATHandlerSmall() {
         for (final SATSolver s : this.solvers) {
             s.add(this.IMP1);
-            final TimeoutSATHandler handler = new TimeoutSATHandler(1000L);
+            final TimeoutSATHandler handler = new TimeoutSATHandler(1000L, -1);
             final Tristate result = s.sat(handler);
             assertThat(handler.aborted()).isFalse();
             assertThat(result).isEqualTo(Tristate.TRUE);
@@ -505,7 +505,7 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
     public void testTimeoutSATHandlerLarge() {
         for (final SATSolver s : this.solvers) {
             s.add(this.pg.generate(10));
-            final TimeoutSATHandler handler = new TimeoutSATHandler(1000L);
+            final TimeoutSATHandler handler = new TimeoutSATHandler(1000L, -1);
             final Tristate result = s.sat(handler);
             assertThat(handler.aborted()).isTrue();
             assertThat(result).isEqualTo(UNDEF);
@@ -607,7 +607,7 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
 
             solver.add(this.f.exo(variables));
             TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(50L);
-            System.out.println(solver.execute(ModelEnumerationFunction.builder().handler(handler).build()).size());
+            solver.execute(ModelEnumerationFunction.builder().handler(handler).build());
             assertThat(handler.aborted()).isTrue();
             solver.reset();
 

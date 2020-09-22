@@ -30,7 +30,7 @@ package org.logicng.handlers;
 
 /**
  * A SAT handler which cancels the solving process after a given timeout.
- * @version 1.6.2
+ * @version 2.1.0
  * @since 1.0
  */
 public final class TimeoutSATHandler extends TimeoutHandler implements SATHandler {
@@ -40,19 +40,15 @@ public final class TimeoutSATHandler extends TimeoutHandler implements SATHandle
      * <p>
      * Note that it might take a few milliseconds more until the sat solver is actually
      * canceled, since the handler depends on the solvers call to {@code detectedConflict()}.
-     * @param timeout the timeout in milliseconds
+     * @param timeout       the timeout in milliseconds
+     * @param designatedEnd the designated end
      */
-    public TimeoutSATHandler(final long timeout) {
-        super(timeout);
+    public TimeoutSATHandler(final long timeout, final long designatedEnd) {
+        super(timeout, designatedEnd);
     }
 
     @Override
     public boolean detectedConflict() {
         return timeLimitExceeded();
-    }
-
-    @Override
-    public void finishedSolving() {
-        // nothing to do here
     }
 }

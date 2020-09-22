@@ -30,42 +30,27 @@ package org.logicng.handlers;
 
 import org.logicng.datastructures.Assignment;
 
+import java.util.function.Supplier;
+
 /**
- * A MaxSAT handler which cancels the solving process after a given timeout.
+ * A optimization handler which cancels the computation process after a given timeout.
  * @version 2.1.0
- * @since 1.0
+ * @since 2.1.0
  */
-public final class TimeoutMaxSATHandler extends TimeoutHandler implements MaxSATHandler {
+public class TimeoutOptimizationHandler extends TimeoutHandler implements OptimizationHandler {
 
     private TimeoutSATHandler satHandler;
-    private int currentLb;
-    private int currentUb;
+    private Supplier<Assignment> lastModelProvider;
 
     /**
      * Constructs a new instance with a given timeout in milliseconds.
      * <p>
-     * Note that it might take a few milliseconds more until the solver is actually canceled,
-     * since the handler depends on the solvers call to {@code foundApproximation()} or {@link SATHandler#detectedConflict()}.
+     * Note that it might take a few milliseconds more until the computation is actually
+     * canceled, since the handler depends on the next found model.
      * @param timeout the timeout in milliseconds
      */
-    public TimeoutMaxSATHandler(final long timeout) {
+    public TimeoutOptimizationHandler(final long timeout) {
         super(timeout, -1);
-        this.currentLb = -1;
-        this.currentUb = -1;
-    }
-
-    @Override
-    public void started() {
-        super.started();
-        this.satHandler = new TimeoutSATHandler(-1, this.designatedEnd);
-        this.satHandler.started();
-        this.currentLb = -1;
-        this.currentUb = -1;
-    }
-
-    @Override
-    public boolean aborted() {
-        return super.aborted() || this.satHandler != null && this.satHandler.aborted();
     }
 
     /**
@@ -79,29 +64,30 @@ public final class TimeoutMaxSATHandler extends TimeoutHandler implements MaxSAT
     }
 
     @Override
-    public boolean foundLowerBound(final int lowerBound, final Assignment model) {
-        this.currentLb = lowerBound;
+    public boolean aborted() {
+        return super.aborted() || this.satHandler != null && this.satHandler.aborted();
+    }
+
+    @Override
+    public void started() {
+        super.started();
+        this.satHandler = new TimeoutSATHandler(-1, this.designatedEnd);
+        this.satHandler.started();
+        this.lastModelProvider = null;
+    }
+
+    @Override
+    public boolean foundBetterBound(final Supplier<Assignment> lastModelProvider) {
+        this.lastModelProvider = lastModelProvider;
         return timeLimitExceeded();
     }
 
-    @Override
-    public boolean foundUpperBound(final int upperBound, final Assignment model) {
-        this.currentUb = upperBound;
-        return timeLimitExceeded();
-    }
-
-    @Override
-    public void finishedSolving() {
-        // nothing to do here
-    }
-
-    @Override
-    public int lowerBoundApproximation() {
-        return this.currentLb;
-    }
-
-    @Override
-    public int upperBoundApproximation() {
-        return this.currentUb;
+    /**
+     * Returns the latest intermediate result of the optimization or {@code null} if no
+     * such result was yet computed.
+     * @return the latest intermediate result
+     */
+    public Assignment getIntermediateResult() {
+        return this.lastModelProvider == null ? null : this.lastModelProvider.get();
     }
 }

@@ -30,7 +30,7 @@ package org.logicng.handlers;
 
 /**
  * A BDD handler which cancels the build process after a given timeout.
- * @version 1.6.2
+ * @version 2.1.0
  * @since 1.6.2
  */
 public final class TimeoutBDDHandler extends TimeoutHandler implements BDDHandler {
@@ -43,7 +43,7 @@ public final class TimeoutBDDHandler extends TimeoutHandler implements BDDHandle
      * @param timeout the timeout in milliseconds
      */
     public TimeoutBDDHandler(final long timeout) {
-        super(timeout);
+        super(timeout, -1);
     }
 
     @Override

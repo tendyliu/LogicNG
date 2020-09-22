@@ -30,7 +30,7 @@ package org.logicng.handlers;
 
 /**
  * An abstract timeout handler.
- * @version 1.6.2
+ * @version 2.1.0
  * @since 1.6.2
  */
 public abstract class TimeoutHandler extends ComputationHandler {
@@ -39,18 +39,26 @@ public abstract class TimeoutHandler extends ComputationHandler {
     protected long designatedEnd;
 
     /**
-     * Constructs a new abstract timeout handler with a given timeout in milliseconds.
-     * @param timeout the timeout in milliseconds
+     * Constructs a new abstract timeout handler with a given timeout or designated end in milliseconds.
+     * If designated end is &gt; 0, the timeout will be ignored and multiple calls to {@link #started()}
+     * will not change the time limit.
+     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillies() + timeout}
+     * on every call to {@link #started()}.
+     * @param timeout       the timeout in milliseconds, ignored if designated end is &gt; 0
+     * @param designatedEnd the designated end time in milliseconds (definition as in {@link System#currentTimeMillis()})
      */
-    public TimeoutHandler(final long timeout) {
-        this.timeout = timeout;
+    public TimeoutHandler(final long timeout, final long designatedEnd) {
+        this.timeout = designatedEnd > 0 ? -1 : timeout;
+        this.designatedEnd = designatedEnd;
     }
 
     @Override
     public void started() {
         super.started();
-        final long start = System.currentTimeMillis();
-        this.designatedEnd = start + this.timeout;
+        if (this.timeout > 0) {
+            final long start = System.currentTimeMillis();
+            this.designatedEnd = start + this.timeout;
+        }
     }
 
     /**
