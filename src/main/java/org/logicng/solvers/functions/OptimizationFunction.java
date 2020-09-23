@@ -167,18 +167,11 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
         final CCIncrementalData incrementalData = solver.addIncrementalCC((CardinalityConstraint) cc);
         Tristate sat = solver.sat(satHandler);
         while (sat == Tristate.TRUE) {
-            final LNGBooleanVector internalFinalModel = solver.underlyingSolver().model();
-            // TODO: this is the better implementation, but the content of internalFinalModel is lost at the end
-//            if (this.handler != null && !this.handler.foundBetterBound(() -> mkResultModel(solver, new LNGBooleanVector(internalFinalModel)))) {
-//                return null;
-//            }
-            if (this.handler != null) {
-                final Assignment assignment = mkResultModel(solver, new LNGBooleanVector(internalFinalModel));
-                if (!this.handler.foundBetterBound(() -> assignment)) {
-                    return null;
-                }
+            final LNGBooleanVector modelCopy = new LNGBooleanVector(solver.underlyingSolver().model());
+            if (this.handler != null && !this.handler.foundBetterBound(() -> mkResultModel(solver, modelCopy))) {
+                return null;
             }
-            internalModel = internalFinalModel;
+            internalModel = modelCopy;
             currentModel = solver.model(selectors);
             currentBound = currentModel.positiveVariables().size();
             if (currentBound == selectors.size()) {
