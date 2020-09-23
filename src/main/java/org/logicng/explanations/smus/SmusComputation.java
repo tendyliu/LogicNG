@@ -149,11 +149,7 @@ public final class SmusComputation {
                 .handler(optimizationHandler)
                 .literals(variables)
                 .minimize().build());
-        if (optimizationHandler != null && optimizationHandler.aborted()) {
-            return null;
-        } else {
-            return new TreeSet<>(minimumHsModel.positiveVariables());
-        }
+        return aborted(handler) ? null : new TreeSet<>(minimumHsModel.positiveVariables());
     }
 
     private static SortedSet<Variable> grow(final SmusHandler handler, final SATSolver growSolver, final SortedSet<Variable> h, final Set<Variable> variables) {
@@ -164,7 +160,7 @@ public final class SmusComputation {
                 .handler(optimizationHandler)
                 .literals(variables)
                 .maximize().build());
-        if (maxModel == null || optimizationHandler != null && optimizationHandler.aborted()) {
+        if (maxModel == null || aborted(handler)) {
             return null;
         } else {
             final List<Variable> maximumSatisfiableSet = maxModel.positiveVariables();
@@ -173,5 +169,9 @@ public final class SmusComputation {
             minimumCorrectionSet.removeAll(maximumSatisfiableSet);
             return minimumCorrectionSet;
         }
+    }
+
+    private static boolean aborted(final SmusHandler handler) {
+        return handler != null && handler.aborted();
     }
 }
