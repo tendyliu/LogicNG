@@ -101,11 +101,11 @@ public final class SmusComputation {
         final SATSolver hSolver = MiniSat.miniSat(f);
         while (true) {
             final SortedSet<Variable> h = minimumHs(handler, hSolver, propositionMapping.keySet());
-            if (handler != null && !handler.computedMinimalHittingSet()) {
+            if (handler != null && (handler.aborted() || !handler.computedMinimalHittingSet())) {
                 return null;
             }
             final SortedSet<Variable> c = grow(handler, growSolver, h, propositionMapping.keySet());
-            if (handler != null && !handler.computedMinimalCorrectionSet()) {
+            if (handler != null && (handler.aborted() || !handler.computedMinimalCorrectionSet())) {
                 return null;
             }
             if (c == null) {
@@ -145,10 +145,15 @@ public final class SmusComputation {
 
     private static SortedSet<Variable> minimumHs(final SmusHandler handler, final SATSolver hSolver, final Set<Variable> variables) {
         final OptimizationHandler optimizationHandler = handler == null ? null : handler.minimalHittingSetOptimizationHandler();
-        return new TreeSet<>(hSolver.execute(OptimizationFunction.builder()
+        final Assignment minimumHsModel = hSolver.execute(OptimizationFunction.builder()
                 .handler(optimizationHandler)
                 .literals(variables)
-                .minimize().build()).positiveVariables());
+                .minimize().build());
+        if (optimizationHandler != null && optimizationHandler.aborted()) {
+            return null;
+        } else {
+            return new TreeSet<>(minimumHsModel.positiveVariables());
+        }
     }
 
     private static SortedSet<Variable> grow(final SmusHandler handler, final SATSolver growSolver, final SortedSet<Variable> h, final Set<Variable> variables) {
@@ -159,13 +164,14 @@ public final class SmusComputation {
                 .handler(optimizationHandler)
                 .literals(variables)
                 .maximize().build());
-        if (maxModel == null) {
+        if (maxModel == null || optimizationHandler != null && optimizationHandler.aborted()) {
             return null;
+        } else {
+            final List<Variable> maximumSatisfiableSet = maxModel.positiveVariables();
+            growSolver.loadState(solverState);
+            final SortedSet<Variable> minimumCorrectionSet = new TreeSet<>(variables);
+            minimumCorrectionSet.removeAll(maximumSatisfiableSet);
+            return minimumCorrectionSet;
         }
-        final List<Variable> maximumSatisfiableSet = maxModel.positiveVariables();
-        growSolver.loadState(solverState);
-        final SortedSet<Variable> minimumCorrectionSet = new TreeSet<>(variables);
-        minimumCorrectionSet.removeAll(maximumSatisfiableSet);
-        return minimumCorrectionSet;
     }
 }

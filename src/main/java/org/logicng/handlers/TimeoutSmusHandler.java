@@ -78,4 +78,14 @@ public final class TimeoutSmusHandler extends TimeoutHandler implements SmusHand
     public boolean computedMinimalCorrectionSet() {
         return timeLimitExceeded();
     }
+
+    @Override
+    public OptimizationHandler minimalHittingSetOptimizationHandler() {
+        return optimizationHandler;
+    }
+
+    @Override
+    public OptimizationHandler minimalCorrectionSetOptimizationHandler() {
+        return optimizationHandler;
+    }
 }
