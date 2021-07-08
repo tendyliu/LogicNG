@@ -104,11 +104,11 @@ public final class AdvancedSimplifier implements FormulaTransformation {
         }
         final SortedSet<Literal> backboneLiterals = backbone.getCompleteBackbone();
         final Formula restrictedFormula = formula.restrict(new Assignment(backboneLiterals));
-        final List<SortedSet<Literal>> primeImplicants = PrimeCompiler.getWithMinimization()
-                .compute(handler, restrictedFormula, PrimeResult.CoverageType.IMPLICANTS_COMPLETE).getPrimeImplicants();
+        final PrimeResult primeResult = PrimeCompiler.getWithMinimization().compute(handler, restrictedFormula, PrimeResult.CoverageType.IMPLICANTS_COMPLETE);
         if (aborted(this.handler)) {
             return null;
         }
+        final List<SortedSet<Literal>> primeImplicants = primeResult.getPrimeImplicants();
         final List<Formula> minimizedPIs = SmusComputation.computeSmusForFormulas(this.handler, negateAllLiterals(primeImplicants, f),
                 Collections.singletonList(restrictedFormula), f);
         if (aborted(this.handler)) {
