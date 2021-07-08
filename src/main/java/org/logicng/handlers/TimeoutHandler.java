@@ -68,7 +68,7 @@ public abstract class TimeoutHandler extends ComputationHandler {
      */
     protected boolean timeLimitExceeded() {
         this.aborted = System.currentTimeMillis() >= this.designatedEnd;
-        return !this.aborted;
+        return this.aborted;
     }
 
     public enum TimerType {
