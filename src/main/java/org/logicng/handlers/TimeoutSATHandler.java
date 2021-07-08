@@ -44,11 +44,15 @@ public final class TimeoutSATHandler extends TimeoutHandler implements SATHandle
      * <p>
      * Note that it might take a few milliseconds more until the sat solver is actually
      * canceled, since the handler depends on the solvers call to {@code detectedConflict()}.
-     * @param timeout       the timeout in milliseconds, ignored if designated end is &gt; 0
-     * @param designatedEnd the designated end time in milliseconds (definition as in {@link System#currentTimeMillis()})
+     * @param timeout the timeout in milliseconds, ignored if designated end is &gt; 0
+     * @param type    the type of the timer, must not be {@code null}
      */
-    public TimeoutSATHandler(final long timeout, final long designatedEnd) {
-        super(timeout, designatedEnd);
+    public TimeoutSATHandler(final long timeout, final TimerType type) {
+        super(timeout, type);
+    }
+
+    public TimeoutSATHandler(final long timeout) {
+        super(timeout);
     }
 
     @Override

@@ -234,7 +234,7 @@ public class PartialMaxSATTest extends TestWithExampleFormulas {
     }
 
     private void testTimeoutHandler(final MaxSATSolver solver) {
-        final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(1000L, 0L);
+        final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(1000L);
 
         final PigeonHoleGenerator pg = new PigeonHoleGenerator(this.f);
         final Formula formula = pg.generate(10);
@@ -256,7 +256,7 @@ public class PartialMaxSATTest extends TestWithExampleFormulas {
     public void testTimeoutHandlerSimple() throws IOException {
         MaxSATSolver solver = MaxSATSolver.wbo(MaxSATConfig.builder().verbosity(SOME).output(this.logStream).build());
         readCNF(solver, "src/test/resources/partialmaxsat/c1355_F176gat-1278gat@1.wcnf");
-        TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(1000L, 0L);
+        TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(1000L);
         MaxSAT.MaxSATResult result = solver.solve(handler);
         assertThat(handler.aborted()).isTrue();
         assertThat(result).isEqualTo(MaxSAT.MaxSATResult.UNDEF);
@@ -264,7 +264,7 @@ public class PartialMaxSATTest extends TestWithExampleFormulas {
 
         solver = MaxSATSolver.wbo(MaxSATConfig.builder().verbosity(SOME).output(this.logStream).build());
         readCNF(solver, "src/test/resources/partialmaxsat/c1355_F1229gat@1.wcnf");
-        handler = new TimeoutMaxSATHandler(5000L, 0L);
+        handler = new TimeoutMaxSATHandler(5000L);
         result = solver.solve(handler);
         assertThat(handler.aborted()).isFalse();
         assertThat(result).isEqualTo(MaxSAT.MaxSATResult.OPTIMUM);
@@ -274,7 +274,7 @@ public class PartialMaxSATTest extends TestWithExampleFormulas {
     public void testTimeoutHandlerUB() throws IOException {
         final MaxSATSolver solver = MaxSATSolver.linearSU(MaxSATConfig.builder().verbosity(SOME).output(this.logStream).build());
         readCNF(solver, "src/test/resources/partialmaxsat/c1355_F1229gat@1.wcnf");
-        final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(5000L, 0L);
+        final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(5000L);
         final MaxSAT.MaxSATResult result = solver.solve(handler);
         assertThat(handler.aborted()).isFalse();
         assertThat(result).isEqualTo(MaxSAT.MaxSATResult.OPTIMUM);

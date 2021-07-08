@@ -493,7 +493,7 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
     public void testTimeoutSATHandlerSmall() {
         for (final SATSolver s : this.solvers) {
             s.add(this.IMP1);
-            final TimeoutSATHandler handler = new TimeoutSATHandler(1000L, -1);
+            final TimeoutSATHandler handler = new TimeoutSATHandler(1000L);
             final Tristate result = s.sat(handler);
             assertThat(handler.aborted()).isFalse();
             assertThat(result).isEqualTo(Tristate.TRUE);
@@ -505,7 +505,7 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
     public void testTimeoutSATHandlerLarge() {
         for (final SATSolver s : this.solvers) {
             s.add(this.pg.generate(10));
-            final TimeoutSATHandler handler = new TimeoutSATHandler(1000L, -1);
+            final TimeoutSATHandler handler = new TimeoutSATHandler(1000L);
             final Tristate result = s.sat(handler);
             assertThat(handler.aborted()).isTrue();
             assertThat(result).isEqualTo(UNDEF);
@@ -589,7 +589,7 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
     public void testTimeoutModelEnumerationHandlerWithUNSATInstance() {
         for (final SATSolver solver : this.solvers) {
             solver.add(this.pg.generate(10));
-            final TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(1000L, 0L);
+            final TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(1000L);
             final List<Assignment> assignments = solver.execute(ModelEnumerationFunction.builder().handler(handler).build());
             assertThat(assignments).isEmpty();
             assertThat(handler.aborted()).isTrue();
@@ -606,13 +606,13 @@ public class SATTest extends TestWithExampleFormulas implements LogicNGTest {
             }
 
             solver.add(this.f.exo(variables));
-            TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(50L, 0L);
+            TimeoutModelEnumerationHandler handler = new TimeoutModelEnumerationHandler(50L);
             solver.execute(ModelEnumerationFunction.builder().handler(handler).build());
             assertThat(handler.aborted()).isTrue();
             solver.reset();
 
             solver.add(this.f.exo(variables.subList(0, 5)));
-            handler = new TimeoutModelEnumerationHandler(1000L, 0L);
+            handler = new TimeoutModelEnumerationHandler(1000L);
             final List<Assignment> assignments = solver.execute(ModelEnumerationFunction.builder().handler(handler).build());
             assertThat(assignments).hasSize(5);
             assertThat(handler.aborted()).isFalse();

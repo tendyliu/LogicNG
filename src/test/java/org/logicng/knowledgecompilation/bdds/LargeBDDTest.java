@@ -100,7 +100,7 @@ public class LargeBDDTest {
         final NQueensGenerator generator = new NQueensGenerator(f);
         final Formula queens = generator.generate(4);
         final BDDKernel kernel = new BDDKernel(f, queens.variables().size(), 10000, 10000);
-        final TimeoutBDDHandler handler = new TimeoutBDDHandler(2000L, 0L);
+        final TimeoutBDDHandler handler = new TimeoutBDDHandler(2000L);
         final BDD bdd = BDDFactory.build(queens, kernel, handler);
         assertThat(handler.aborted()).isFalse();
         assertThat(bdd.index()).isNotEqualTo(BDDKernel.BDD_ABORT);
@@ -112,7 +112,7 @@ public class LargeBDDTest {
         final NQueensGenerator generator = new NQueensGenerator(f);
         final Formula queens = generator.generate(10);
         final BDDKernel kernel = new BDDKernel(f, queens.variables().size(), 10000, 10000);
-        final TimeoutBDDHandler handler = new TimeoutBDDHandler(1000L, 0L);
+        final TimeoutBDDHandler handler = new TimeoutBDDHandler(1000L);
         final BDD bdd = BDDFactory.build(queens, kernel, handler);
         assertThat(handler.aborted()).isTrue();
         assertThat(bdd.index()).isEqualTo(BDDKernel.BDD_ABORT);

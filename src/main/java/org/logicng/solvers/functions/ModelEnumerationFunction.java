@@ -30,6 +30,7 @@ package org.logicng.solvers.functions;
 
 import static org.logicng.datastructures.Tristate.TRUE;
 import static org.logicng.datastructures.Tristate.UNDEF;
+import static org.logicng.handlers.Handler.start;
 
 import org.logicng.collections.LNGBooleanVector;
 import org.logicng.collections.LNGIntVector;
@@ -81,9 +82,7 @@ public final class ModelEnumerationFunction implements SolverFunction<List<Assig
 
     @Override
     public List<Assignment> apply(final MiniSat solver, final Consumer<Tristate> resultSetter) {
-        if (this.handler != null) {
-            this.handler.started();
-        }
+        start(this.handler);
         final List<Assignment> models = new ArrayList<>();
         SolverState stateBeforeEnumeration = null;
         if (solver.getStyle() == MiniSat.SolverStyle.MINISAT && solver.isIncremental()) {

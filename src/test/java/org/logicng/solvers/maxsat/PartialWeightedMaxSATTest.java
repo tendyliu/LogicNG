@@ -269,7 +269,7 @@ public class PartialWeightedMaxSATTest extends TestWithExampleFormulas {
     }
 
     private void testTimeoutHandler(final MaxSATSolver solver) {
-        final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(1000L, 0L);
+        final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(1000L);
 
         final PigeonHoleGenerator pg = new PigeonHoleGenerator(this.f);
         final Formula formula = pg.generate(10);

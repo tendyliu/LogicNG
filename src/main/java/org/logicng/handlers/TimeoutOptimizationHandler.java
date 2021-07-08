@@ -51,11 +51,15 @@ public class TimeoutOptimizationHandler extends TimeoutHandler implements Optimi
      * <p>
      * Note that it might take a few milliseconds more until the computation is actually
      * canceled, since the handler depends on the next found model.
-     * @param timeout       the timeout in milliseconds, ignored if designated end is &gt; 0
-     * @param designatedEnd the designated end time in milliseconds (definition as in {@link System#currentTimeMillis()})
+     * @param timeout the timeout in milliseconds, ignored if designated end is &gt; 0
+     * @param type    the type of the timer, must not be {@code null}
      */
-    public TimeoutOptimizationHandler(final long timeout, final long designatedEnd) {
-        super(timeout, designatedEnd);
+    public TimeoutOptimizationHandler(final long timeout, final TimerType type) {
+        super(timeout, type);
+    }
+
+    public TimeoutOptimizationHandler(final long timeout) {
+        super(timeout);
     }
 
     /**
@@ -70,13 +74,15 @@ public class TimeoutOptimizationHandler extends TimeoutHandler implements Optimi
 
     @Override
     public boolean aborted() {
-        return super.aborted() || this.satHandler != null && this.satHandler.aborted();
+        return super.aborted() || Handler.aborted(this.satHandler);
     }
 
     @Override
     public void started() {
         super.started();
-        this.satHandler = new TimeoutSATHandler(-1, this.designatedEnd);
+        if (this.satHandler == null || this.type == TimerType.RESTARTING_TIMEOUT) {
+            this.satHandler = new TimeoutSATHandler(this.designatedEnd, TimerType.FIXED_END);
+        }
         this.lastModelProvider = null;
     }
 

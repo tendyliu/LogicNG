@@ -49,4 +49,14 @@ public interface SATHandler extends Handler {
     default void finishedSolving() {
 
     }
+
+    /**
+     * Null-safe helper method to call {@link SATHandler#finishedSolving} on a handler.
+     * @param handler the handler to finished, may be {@code null}
+     */
+    static void finishSolving(final SATHandler handler) {
+        if (handler != null) {
+            handler.finishedSolving();
+        }
+    }
 }

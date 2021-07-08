@@ -35,29 +35,30 @@ package org.logicng.handlers;
  */
 public abstract class TimeoutHandler extends ComputationHandler {
 
-    protected final long timeout;
+    protected long timeout;
+    protected final TimerType type;
     protected long designatedEnd;
 
     /**
-     * Constructs a new abstract timeout handler with a given timeout or designated end in milliseconds.
-     * If designated end is &gt; 0, the timeout will be ignored and multiple calls to {@link #started()}
-     * will not change the time limit.
-     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillis() + timeout}
-     * on every call to {@link #started()}.
-     * @param timeout       the timeout in milliseconds, ignored if designated end is &gt; 0
-     * @param designatedEnd the designated end time in milliseconds (definition as in {@link System#currentTimeMillis()})
+     * Constructs a new abstract timeout handler with a given timeout and a timeout type.
+     * @param timeout the timeout in milliseconds, its meaning is defined by the timeout type
+     * @param type    the type of the timer, must not be {@code null}
      */
-    public TimeoutHandler(final long timeout, final long designatedEnd) {
-        this.timeout = designatedEnd > 0 ? -1 : timeout;
-        this.designatedEnd = designatedEnd;
+    public TimeoutHandler(final long timeout, final TimerType type) {
+        this.type = type;
+        this.timeout = type == TimerType.FIXED_END ? 0 : timeout;
+        this.designatedEnd = type == TimerType.FIXED_END ? timeout : 0;
+    }
+
+    public TimeoutHandler(final long timeout) {
+        this(timeout, TimerType.SINGLE_TIMEOUT);
     }
 
     @Override
     public void started() {
         super.started();
-        if (this.timeout > 0) {
-            final long start = System.currentTimeMillis();
-            this.designatedEnd = start + this.timeout;
+        if (this.type == TimerType.RESTARTING_TIMEOUT || this.designatedEnd == 0) {
+            this.designatedEnd = System.currentTimeMillis() + this.timeout;
         }
     }
 
@@ -67,6 +68,29 @@ public abstract class TimeoutHandler extends ComputationHandler {
      */
     protected boolean timeLimitExceeded() {
         this.aborted = System.currentTimeMillis() >= this.designatedEnd;
-        return this.aborted;
+        return !this.aborted;
+    }
+
+    public enum TimerType {
+        /**
+         * Simple timeout which is started when {@link Handler#started()} is called.
+         * <p>
+         * Multiple calls to {@link Handler#started()} do not restart the timeout.
+         */
+        SINGLE_TIMEOUT,
+
+        /**
+         * Timeout which is restarted on every call to {@link Handler#started()}.
+         */
+        RESTARTING_TIMEOUT,
+
+        /**
+         * Timeout which is interpreted as fixed point in time (in milliseconds) at
+         * which the computation should be aborted.
+         * <p>
+         * The method {@link Handler#started()} must still be called, but does not have
+         * an effect on the timeout.
+         */
+        FIXED_END
     }
 }

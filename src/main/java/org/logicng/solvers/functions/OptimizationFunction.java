@@ -28,6 +28,8 @@
 
 package org.logicng.solvers.functions;
 
+import static org.logicng.handlers.Handler.start;
+
 import org.logicng.cardinalityconstraints.CCIncrementalData;
 import org.logicng.collections.LNGBooleanVector;
 import org.logicng.collections.LNGIntVector;
@@ -122,9 +124,7 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
     }
 
     private Assignment maximize(final MiniSat solver) {
-        if (this.handler != null) {
-            this.handler.started();
-        }
+        start(this.handler);
         final FormulaFactory f = solver.factory();
         LNGBooleanVector internalModel;
         final Map<Variable, Literal> selectorMap = new TreeMap<>();
@@ -190,11 +190,11 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
     }
 
     private SATHandler satHandler() {
-        return handler == null ? null : handler.satHandler();
+        return this.handler == null ? null : this.handler.satHandler();
     }
 
     private boolean aborted() {
-        return handler != null && handler.aborted();
+        return this.handler != null && this.handler.aborted();
     }
 
     private Assignment mkResultModel(final MiniSat solver, final LNGBooleanVector internalModel) {

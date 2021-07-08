@@ -50,26 +50,32 @@ public final class TimeoutMaxSATHandler extends TimeoutHandler implements MaxSAT
      * <p>
      * Note that it might take a few milliseconds more until the solver is actually canceled,
      * since the handler depends on the solvers call to {@code foundApproximation()} or {@link SATHandler#detectedConflict()}.
-     * @param timeout       the timeout in milliseconds, ignored if designated end is &gt; 0
-     * @param designatedEnd the designated end time in milliseconds (definition as in {@link System#currentTimeMillis()})
+     * @param timeout the timeout in milliseconds, ignored if designated end is &gt; 0
+     * @param type    the type of the timer, must not be {@code null}
      */
-    public TimeoutMaxSATHandler(final long timeout, final long designatedEnd) {
-        super(timeout, designatedEnd);
+    public TimeoutMaxSATHandler(final long timeout, final TimerType type) {
+        super(timeout, type);
         this.currentLb = -1;
         this.currentUb = -1;
+    }
+
+    public TimeoutMaxSATHandler(final long timeout) {
+        super(timeout);
     }
 
     @Override
     public void started() {
         super.started();
-        this.satHandler = new TimeoutSATHandler(-1, this.designatedEnd);
+        if (this.satHandler == null || this.type == TimerType.RESTARTING_TIMEOUT) {
+            this.satHandler = new TimeoutSATHandler(this.designatedEnd, TimerType.FIXED_END);
+        }
         this.currentLb = -1;
         this.currentUb = -1;
     }
 
     @Override
     public boolean aborted() {
-        return super.aborted() || this.satHandler != null && this.satHandler.aborted();
+        return super.aborted() || Handler.aborted(this.satHandler);
     }
 
     /**

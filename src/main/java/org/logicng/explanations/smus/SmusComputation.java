@@ -28,13 +28,15 @@
 
 package org.logicng.explanations.smus;
 
+import static org.logicng.handlers.Handler.aborted;
+import static org.logicng.handlers.Handler.start;
+
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Tristate;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Variable;
 import org.logicng.handlers.OptimizationHandler;
-import org.logicng.handlers.SmusHandler;
 import org.logicng.propositions.Proposition;
 import org.logicng.propositions.StandardProposition;
 import org.logicng.solvers.MiniSat;
@@ -80,10 +82,8 @@ public final class SmusComputation {
      * @param <P>                   the subtype of the propositions
      * @return the SMUS or {@code null} if the given propositions are satisfiable
      */
-    public static <P extends Proposition> List<P> computeSmus(final SmusHandler handler, final List<P> propositions, final List<Formula> additionalConstraints, final FormulaFactory f) {
-        if (handler != null) {
-            handler.started();
-        }
+    public static <P extends Proposition> List<P> computeSmus(final OptimizationHandler handler, final List<P> propositions, final List<Formula> additionalConstraints, final FormulaFactory f) {
+        start(handler);
         final SATSolver growSolver = MiniSat.miniSat(f);
         growSolver.add(additionalConstraints == null ? Collections.singletonList(f.verum()) : additionalConstraints);
         if (growSolver.sat() == Tristate.FALSE) {
@@ -101,18 +101,15 @@ public final class SmusComputation {
         final SATSolver hSolver = MiniSat.miniSat(f);
         while (true) {
             final SortedSet<Variable> h = minimumHs(handler, hSolver, propositionMapping.keySet());
-            if (handler != null && (handler.aborted() || !handler.computedMinimalHittingSet())) {
+            if (handler != null && handler.aborted()) {
                 return null;
             }
             final SortedSet<Variable> c = grow(handler, growSolver, h, propositionMapping.keySet());
-            if (handler != null && (handler.aborted() || !handler.computedMinimalCorrectionSet())) {
+            if (handler != null && handler.aborted()) {
                 return null;
             }
             if (c == null) {
                 return h.stream().map(propositionMapping::get).collect(Collectors.toList());
-            }
-            if (handler != null && !handler.foundLowerBound(h.size())) {
-                return null;
             }
             hSolver.add(f.or(c));
         }
@@ -137,27 +134,25 @@ public final class SmusComputation {
      * @param f                     the formula factory
      * @return the SMUS or {@code null} if the given formulas are satisfiable
      */
-    public static List<Formula> computeSmusForFormulas(final SmusHandler handler, final List<Formula> formulas, final List<Formula> additionalConstraints, final FormulaFactory f) {
+    public static List<Formula> computeSmusForFormulas(final OptimizationHandler handler, final List<Formula> formulas, final List<Formula> additionalConstraints, final FormulaFactory f) {
         final List<Proposition> props = formulas.stream().map(StandardProposition::new).collect(Collectors.toList());
         final List<Proposition> smus = computeSmus(handler, props, additionalConstraints, f);
         return smus == null ? null : smus.stream().map(Proposition::formula).collect(Collectors.toList());
     }
 
-    private static SortedSet<Variable> minimumHs(final SmusHandler handler, final SATSolver hSolver, final Set<Variable> variables) {
-        final OptimizationHandler optimizationHandler = handler == null ? null : handler.minimalHittingSetOptimizationHandler();
+    private static SortedSet<Variable> minimumHs(final OptimizationHandler handler, final SATSolver hSolver, final Set<Variable> variables) {
         final Assignment minimumHsModel = hSolver.execute(OptimizationFunction.builder()
-                .handler(optimizationHandler)
+                .handler(handler)
                 .literals(variables)
                 .minimize().build());
         return aborted(handler) ? null : new TreeSet<>(minimumHsModel.positiveVariables());
     }
 
-    private static SortedSet<Variable> grow(final SmusHandler handler, final SATSolver growSolver, final SortedSet<Variable> h, final Set<Variable> variables) {
+    private static SortedSet<Variable> grow(final OptimizationHandler handler, final SATSolver growSolver, final SortedSet<Variable> h, final Set<Variable> variables) {
         final SolverState solverState = growSolver.saveState();
         growSolver.add(h);
-        final OptimizationHandler optimizationHandler = handler == null ? null : handler.minimalCorrectionSetOptimizationHandler();
         final Assignment maxModel = growSolver.execute(OptimizationFunction.builder()
-                .handler(optimizationHandler)
+                .handler(handler)
                 .literals(variables)
                 .maximize().build());
         if (maxModel == null || aborted(handler)) {
@@ -169,9 +164,5 @@ public final class SmusComputation {
             minimumCorrectionSet.removeAll(maximumSatisfiableSet);
             return minimumCorrectionSet;
         }
-    }
-
-    private static boolean aborted(final SmusHandler handler) {
-        return handler != null && handler.aborted();
     }
 }

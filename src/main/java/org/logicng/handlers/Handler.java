@@ -44,11 +44,30 @@ public interface Handler {
     default boolean aborted() {
         return false;
     }
-    
+
     /**
      * This method is called when the computation starts.
      */
     default void started() {
 
+    }
+
+    /**
+     * Returns {@code true} if the handler is not {@code null} and is already aborted.
+     * @param handler the handler to check
+     * @return {@code true} if the handler is not {@code null} and is already aborted, otherwise {@code false}
+     */
+    static boolean aborted(final Handler handler) {
+        return handler != null && handler.aborted();
+    }
+
+    /**
+     * Null-safe helper method to start a handler.
+     * @param handler the handler to start, may be {@code null}
+     */
+    static void start(final Handler handler) {
+        if (handler != null) {
+            handler.started();
+        }
     }
 }

@@ -44,11 +44,15 @@ public final class TimeoutBDDHandler extends TimeoutHandler implements BDDHandle
      * <p>
      * Note that it might take a few milliseconds more until the build process is actually canceled, since the handler
      * depends on the BDD factory's call to {@link org.logicng.knowledgecompilation.bdds.jbuddy.BDDKernel#addRef(int, BDDHandler)}.
-     * @param timeout       the timeout in milliseconds, ignored if designated end is &gt; 0
-     * @param designatedEnd the designated end time in milliseconds (definition as in {@link System#currentTimeMillis()})
+     * @param timeout the timeout in milliseconds, ignored if designated end is &gt; 0
+     * @param type    the type of the timer, must not be {@code null}
      */
-    public TimeoutBDDHandler(final long timeout, final long designatedEnd) {
-        super(timeout, designatedEnd);
+    public TimeoutBDDHandler(final long timeout, final TimerType type) {
+        super(timeout, type);
+    }
+
+    public TimeoutBDDHandler(final long timeout) {
+        super(timeout);
     }
 
     @Override
