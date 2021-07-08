@@ -37,7 +37,7 @@ public interface SATHandler extends Handler {
 
     /**
      * This method is called every time a conflict is found.
-     * @return whether SAT solving should be continued or not
+     * @return {@code true} if the SAT solving should be continued, otherwise {@code false}
      */
     default boolean detectedConflict() {
         return true;

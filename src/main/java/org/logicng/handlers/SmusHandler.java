@@ -38,13 +38,13 @@ public interface SmusHandler extends Handler {
     /**
      * This method is called when the SMUS procedure found a new lower bound for the smallest MUS.
      * @param lowerBound the found lower bound
-     * @return whether the search should be continued or not
+     * @return {@code true} if the search should be continued, otherwise {@code false}
      */
     boolean foundLowerBound(int lowerBound);
 
     /**
      * This method is called when the SMUS procedure computed the next minimal hitting set.
-     * @return whether the search should be continued or not
+     * @return {@code true} if the search should be continued, otherwise {@code false}
      */
     default boolean computedMinimalHittingSet() {
         return true;
@@ -52,7 +52,7 @@ public interface SmusHandler extends Handler {
 
     /**
      * This method is called when the SMUS procedure computed the next minimal correction set.
-     * @return whether the search should be continued or not
+     * @return {@code true} if the search should be continued, otherwise {@code false}
      */
     default boolean computedMinimalCorrectionSet() {
         return true;

@@ -37,7 +37,7 @@ public interface AdvancedSimplifierHandler extends Handler {
 
     /**
      * This method is called when the advanced simplifier computed the backbone.
-     * @return whether the search should be continued or not
+     * @return {@code true} if the search should be continued, otherwise {@code false}
      */
     default boolean computedBackbone() {
         return true;
@@ -45,7 +45,7 @@ public interface AdvancedSimplifierHandler extends Handler {
 
     /**
      * This method is called when the advanced simplifier computed the prime implicants.
-     * @return whether the search should be continued or not
+     * @return {@code true} if the search should be continued, otherwise {@code false}
      */
     default boolean computedPrimeImplicants() {
         return true;
@@ -53,7 +53,7 @@ public interface AdvancedSimplifierHandler extends Handler {
 
     /**
      * This method is called when the advanced simplifier computed the SMUS.
-     * @return whether the search should be continued or not
+     * @return {@code true} if the search should be continued, otherwise {@code false}
      */
     default boolean computedSmus() {
         return true;
@@ -61,7 +61,7 @@ public interface AdvancedSimplifierHandler extends Handler {
 
     /**
      * This method is called when the advanced simplifier computed the factor out simplification.
-     * @return whether the search should be continued or not
+     * @return {@code true} if the search should be continued, otherwise {@code false}
      */
     default boolean computedFactorOutSimplification() {
         return true;

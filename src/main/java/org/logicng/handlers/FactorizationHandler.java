@@ -39,7 +39,7 @@ public interface FactorizationHandler extends Handler {
 
     /**
      * This method is called every time a distribution is performed.
-     * @return whether the factorization should be continued or not
+     * @return {@code true} if the factorization should be continued, otherwise {@code false}
      */
     default boolean performedDistribution() {
         return true;
@@ -48,7 +48,7 @@ public interface FactorizationHandler extends Handler {
     /**
      * This method is called every time a new clause is created.
      * @param clause the clause
-     * @return whether the factorization should be continued or not
+     * @return {@code true} if the factorization should be continued, otherwise {@code false}
      */
     default boolean createdClause(final Formula clause) {
         return true;

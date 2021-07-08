@@ -27,7 +27,7 @@ public interface OptimizationHandler extends Handler {
      * @param currentResultProvider a provider for the current result, can be used to examine
      *                              the current result or to use this result if the
      *                              optimization should be aborted
-     * @return whether the optimization process should be continued or not
+     * @return {@code true} if the optimization process should be continued, otherwise {@code false}
      */
     default boolean foundBetterBound(final Supplier<Assignment> currentResultProvider) {
         return true;

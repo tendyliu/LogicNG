@@ -51,7 +51,7 @@ public interface ModelEnumerationHandler extends Handler {
     /**
      * This method is called every time a model is found.
      * @param assignment the respective model
-     * @return whether more models should be searched or not
+     * @return {@code true} if more models should be searched, otherwise {@code false}
      */
     boolean foundModel(Assignment assignment);
 }

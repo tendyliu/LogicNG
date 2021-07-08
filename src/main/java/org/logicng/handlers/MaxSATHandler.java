@@ -52,7 +52,7 @@ public interface MaxSATHandler extends Handler {
      * This method is called when the MaxSAT solver found a new lower bound for a solution.
      * @param lowerBound the cost of the lower bound
      * @param model      the model of the lower bound, may be null if not applicable
-     * @return whether solving process should be continued or not
+     * @return {@code true} if the solving process should be continued, otherwise {@code false}
      */
     boolean foundLowerBound(final int lowerBound, final Assignment model);
 
@@ -60,7 +60,7 @@ public interface MaxSATHandler extends Handler {
      * This method is called when the MaxSAT solver found a new upper bound for a solution.
      * @param upperBound the cost of the upper bound
      * @param model      the model of the upper bound, may be null if not applicable
-     * @return whether solving process should be continued or not
+     * @return {@code true} if the solving process should be continued, otherwise {@code false}
      */
     boolean foundUpperBound(final int upperBound, final Assignment model);
 
