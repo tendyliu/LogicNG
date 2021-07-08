@@ -83,6 +83,9 @@ public final class AdvancedSimplifier implements FormulaTransformation {
 
     /**
      * Constructs a new simplifier with the given handler and rating functions.
+     * <p>
+     * The simplifier can be called with an {@link OptimizationHandler}. The given handler instance will be used for every subsequent
+     * {@link org.logicng.solvers.functions.OptimizationFunction} call.
      * @param handler        the handler, can be {@code null}
      * @param ratingFunction the rating function
      */

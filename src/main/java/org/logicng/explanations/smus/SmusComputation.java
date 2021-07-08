@@ -75,6 +75,9 @@ public final class SmusComputation {
 
     /**
      * Computes the SMUS for the given list of propositions modulo some additional constraint.
+     * <p>
+     * The SMUS computation can be called with an {@link OptimizationHandler}. The given handler instance will be used for every subsequent
+     * * {@link org.logicng.solvers.functions.OptimizationFunction} call.
      * @param handler               the handler, can be {@code null}
      * @param propositions          the propositions
      * @param additionalConstraints the additional constraints

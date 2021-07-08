@@ -116,6 +116,9 @@ public final class PrimeCompiler {
      * Computes prime implicants and prime implicates for a given formula.
      * The coverage type specifies if the implicants or the implicates will
      * be complete, the other one will still be a cover of the given formula.
+     * <p>
+     * The prime compiler can be called with an {@link OptimizationHandler}. The given handler instance will be used for every subsequent
+     * {@link org.logicng.solvers.functions.OptimizationFunction} call.
      * @param handler the handler, can be {@code null}
      * @param formula the formula
      * @param type    the coverage type
