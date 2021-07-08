@@ -39,7 +39,7 @@ public final class TimeoutSATHandler extends TimeoutHandler implements SATHandle
      * Constructs a new instance with a given timeout or designated end in milliseconds.
      * If designated end is &gt; 0, the timeout will be ignored and multiple calls to {@link #started()}
      * will not change the time limit.
-     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillies() + timeout}
+     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillis() + timeout}
      * on every call to {@link #started()}.
      * <p>
      * Note that it might take a few milliseconds more until the sat solver is actually
@@ -53,6 +53,6 @@ public final class TimeoutSATHandler extends TimeoutHandler implements SATHandle
 
     @Override
     public boolean detectedConflict() {
-        return timeLimitExceeded();
+        return !timeLimitExceeded();
     }
 }

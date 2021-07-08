@@ -45,7 +45,7 @@ public final class TimeoutMaxSATHandler extends TimeoutHandler implements MaxSAT
      * Constructs a new instance with a given timeout or designated end in milliseconds.
      * If designated end is &gt; 0, the timeout will be ignored and multiple calls to {@link #started()}
      * will not change the time limit.
-     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillies() + timeout}
+     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillis() + timeout}
      * on every call to {@link #started()}.
      * <p>
      * Note that it might take a few milliseconds more until the solver is actually canceled,
@@ -85,13 +85,13 @@ public final class TimeoutMaxSATHandler extends TimeoutHandler implements MaxSAT
     @Override
     public boolean foundLowerBound(final int lowerBound, final Assignment model) {
         this.currentLb = lowerBound;
-        return timeLimitExceeded();
+        return !timeLimitExceeded();
     }
 
     @Override
     public boolean foundUpperBound(final int upperBound, final Assignment model) {
         this.currentUb = upperBound;
-        return timeLimitExceeded();
+        return !timeLimitExceeded();
     }
 
     @Override

@@ -43,7 +43,7 @@ public class TimeoutModelEnumerationHandler extends TimeoutHandler implements Mo
      * Constructs a new instance with a given timeout or designated end in milliseconds.
      * If designated end is &gt; 0, the timeout will be ignored and multiple calls to {@link #started()}
      * will not change the time limit.
-     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillies() + timeout}
+     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillis() + timeout}
      * on every call to {@link #started()}.
      * <p>
      * Note that it might take a few milliseconds more until the computation is actually
@@ -78,6 +78,6 @@ public class TimeoutModelEnumerationHandler extends TimeoutHandler implements Mo
 
     @Override
     public boolean foundModel(final Assignment assignment) {
-        return timeLimitExceeded();
+        return !timeLimitExceeded();
     }
 }

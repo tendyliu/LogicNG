@@ -42,7 +42,7 @@ public abstract class TimeoutHandler extends ComputationHandler {
      * Constructs a new abstract timeout handler with a given timeout or designated end in milliseconds.
      * If designated end is &gt; 0, the timeout will be ignored and multiple calls to {@link #started()}
      * will not change the time limit.
-     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillies() + timeout}
+     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillis() + timeout}
      * on every call to {@link #started()}.
      * @param timeout       the timeout in milliseconds, ignored if designated end is &gt; 0
      * @param designatedEnd the designated end time in milliseconds (definition as in {@link System#currentTimeMillis()})
@@ -67,6 +67,6 @@ public abstract class TimeoutHandler extends ComputationHandler {
      */
     protected boolean timeLimitExceeded() {
         this.aborted = System.currentTimeMillis() >= this.designatedEnd;
-        return !this.aborted;
+        return this.aborted;
     }
 }

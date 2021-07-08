@@ -46,7 +46,7 @@ public class TimeoutOptimizationHandler extends TimeoutHandler implements Optimi
      * Constructs a new instance with a given timeout or designated end in milliseconds.
      * If designated end is &gt; 0, the timeout will be ignored and multiple calls to {@link #started()}
      * will not change the time limit.
-     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillies() + timeout}
+     * If designated end is &lt;= 0, the time limit of this handler will be reset to {@code System.currentTimeMillis() + timeout}
      * on every call to {@link #started()}.
      * <p>
      * Note that it might take a few milliseconds more until the computation is actually
@@ -83,7 +83,7 @@ public class TimeoutOptimizationHandler extends TimeoutHandler implements Optimi
     @Override
     public boolean foundBetterBound(final Supplier<Assignment> lastModelProvider) {
         this.lastModelProvider = lastModelProvider;
-        return timeLimitExceeded();
+        return !timeLimitExceeded();
     }
 
     /**
