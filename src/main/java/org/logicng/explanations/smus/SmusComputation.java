@@ -82,7 +82,8 @@ public final class SmusComputation {
      * @param <P>                   the subtype of the propositions
      * @return the SMUS or {@code null} if the given propositions are satisfiable
      */
-    public static <P extends Proposition> List<P> computeSmus(final OptimizationHandler handler, final List<P> propositions, final List<Formula> additionalConstraints, final FormulaFactory f) {
+    public static <P extends Proposition> List<P> computeSmus(final OptimizationHandler handler, final List<P> propositions, final List<Formula> additionalConstraints,
+                                                              final FormulaFactory f) {
         start(handler);
         final SATSolver growSolver = MiniSat.miniSat(f);
         growSolver.add(additionalConstraints == null ? Collections.singletonList(f.verum()) : additionalConstraints);
@@ -101,11 +102,11 @@ public final class SmusComputation {
         final SATSolver hSolver = MiniSat.miniSat(f);
         while (true) {
             final SortedSet<Variable> h = minimumHs(handler, hSolver, propositionMapping.keySet());
-            if (handler != null && handler.aborted()) {
+            if (aborted(handler)) {
                 return null;
             }
             final SortedSet<Variable> c = grow(handler, growSolver, h, propositionMapping.keySet());
-            if (handler != null && handler.aborted()) {
+            if (aborted(handler)) {
                 return null;
             }
             if (c == null) {
@@ -134,7 +135,8 @@ public final class SmusComputation {
      * @param f                     the formula factory
      * @return the SMUS or {@code null} if the given formulas are satisfiable
      */
-    public static List<Formula> computeSmusForFormulas(final OptimizationHandler handler, final List<Formula> formulas, final List<Formula> additionalConstraints, final FormulaFactory f) {
+    public static List<Formula> computeSmusForFormulas(final OptimizationHandler handler, final List<Formula> formulas, final List<Formula> additionalConstraints,
+                                                       final FormulaFactory f) {
         final List<Proposition> props = formulas.stream().map(StandardProposition::new).collect(Collectors.toList());
         final List<Proposition> smus = computeSmus(handler, props, additionalConstraints, f);
         return smus == null ? null : smus.stream().map(Proposition::formula).collect(Collectors.toList());

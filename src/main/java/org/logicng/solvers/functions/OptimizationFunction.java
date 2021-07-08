@@ -28,6 +28,7 @@
 
 package org.logicng.solvers.functions;
 
+import static org.logicng.handlers.Handler.aborted;
 import static org.logicng.handlers.Handler.start;
 
 import org.logicng.cardinalityconstraints.CCIncrementalData;
@@ -74,7 +75,8 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
     private final boolean maximize;
     private final OptimizationHandler handler;
 
-    private OptimizationFunction(final Collection<? extends Literal> literals, final Collection<Variable> additionalVariables, final boolean maximize, final OptimizationHandler handler) {
+    private OptimizationFunction(final Collection<? extends Literal> literals, final Collection<Variable> additionalVariables, final boolean maximize,
+                                 final OptimizationHandler handler) {
         this.literals = literals;
         this.resultModelVariables = new TreeSet<>(additionalVariables);
         for (final Literal lit : literals) {
@@ -141,7 +143,7 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
             selectorMap.forEach((selVar, lit) -> solver.add(f.or(lit, selVar)));
         }
         Tristate sat = solver.sat(satHandler());
-        if (sat != Tristate.TRUE || aborted()) {
+        if (sat != Tristate.TRUE || aborted(handler)) {
             return null;
         }
         internalModel = solver.underlyingSolver().model();
@@ -150,7 +152,7 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
         if (currentBound == 0) {
             solver.add(f.cc(CType.GE, 1, selectors));
             sat = solver.sat(satHandler());
-            if (aborted()) {
+            if (aborted(handler)) {
                 return null;
             } else if (sat == Tristate.FALSE) {
                 return mkResultModel(solver, internalModel);
@@ -166,7 +168,7 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
         assert cc instanceof CardinalityConstraint;
         final CCIncrementalData incrementalData = solver.addIncrementalCC((CardinalityConstraint) cc);
         sat = solver.sat(satHandler());
-        if (aborted()) {
+        if (aborted(handler)) {
             return null;
         }
         while (sat == Tristate.TRUE) {
@@ -182,7 +184,7 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
             }
             incrementalData.newLowerBoundForSolver(currentBound + 1);
             sat = solver.sat(satHandler());
-            if (aborted()) {
+            if (aborted(handler)) {
                 return null;
             }
         }
@@ -191,10 +193,6 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
 
     private SATHandler satHandler() {
         return this.handler == null ? null : this.handler.satHandler();
-    }
-
-    private boolean aborted() {
-        return this.handler != null && this.handler.aborted();
     }
 
     private Assignment mkResultModel(final MiniSat solver, final LNGBooleanVector internalModel) {
