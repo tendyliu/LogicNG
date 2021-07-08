@@ -75,7 +75,7 @@ public final class SmusComputation {
 
     /**
      * Computes the SMUS for the given list of propositions modulo some additional constraint.
-     * @param handler               the SMUS handler, can be {@code null}
+     * @param handler               the handler, can be {@code null}
      * @param propositions          the propositions
      * @param additionalConstraints the additional constraints
      * @param f                     the formula factory

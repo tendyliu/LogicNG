@@ -83,7 +83,7 @@ public final class AdvancedSimplifier implements FormulaTransformation {
 
     /**
      * Constructs a new simplifier with the given handler and rating functions.
-     * @param handler        the handler
+     * @param handler        the handler, can be {@code null}
      * @param ratingFunction the rating function
      */
     public AdvancedSimplifier(final OptimizationHandler handler, final RatingFunction<?> ratingFunction) {
@@ -102,7 +102,7 @@ public final class AdvancedSimplifier implements FormulaTransformation {
         final SortedSet<Literal> backboneLiterals = backbone.getCompleteBackbone();
         final Formula restrictedFormula = formula.restrict(new Assignment(backboneLiterals));
         final List<SortedSet<Literal>> primeImplicants = PrimeCompiler.getWithMinimization()
-                .compute(restrictedFormula, PrimeResult.CoverageType.IMPLICANTS_COMPLETE).getPrimeImplicants();
+                .compute(handler, restrictedFormula, PrimeResult.CoverageType.IMPLICANTS_COMPLETE).getPrimeImplicants();
         if (aborted(this.handler)) {
             return null;
         }

@@ -28,12 +28,16 @@
 
 package org.logicng.primecomputation;
 
+import static org.logicng.handlers.Handler.aborted;
+import static org.logicng.handlers.Handler.start;
+
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Tristate;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
+import org.logicng.handlers.OptimizationHandler;
 import org.logicng.solvers.MiniSat;
 import org.logicng.solvers.SATSolver;
 import org.logicng.solvers.functions.OptimizationFunction;
@@ -64,7 +68,7 @@ import java.util.TreeSet;
  * {@link #getWithMaximization()} and another which searches for minimum models
  * {@link #getWithMaximization()}. From experience, the one with minimum models usually
  * outperforms the one with maximum models.
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public final class PrimeCompiler {
@@ -105,16 +109,33 @@ public final class PrimeCompiler {
      * @return the prime result
      */
     public PrimeResult compute(final Formula formula, final PrimeResult.CoverageType type) {
+        return compute(null, formula, type);
+    }
+
+    /**
+     * Computes prime implicants and prime implicates for a given formula.
+     * The coverage type specifies if the implicants or the implicates will
+     * be complete, the other one will still be a cover of the given formula.
+     * @param handler the handler, can be {@code null}
+     * @param formula the formula
+     * @param type    the coverage type
+     * @return the prime result
+     */
+    public PrimeResult compute(final OptimizationHandler handler, final Formula formula, final PrimeResult.CoverageType type) {
+        start(handler);
         final boolean completeImplicants = type == PrimeResult.CoverageType.IMPLICANTS_COMPLETE;
         final Formula formulaForComputation = completeImplicants ? formula : formula.negate();
-        final Pair<List<SortedSet<Literal>>, List<SortedSet<Literal>>> result = computeGeneric(formulaForComputation);
+        final Pair<List<SortedSet<Literal>>, List<SortedSet<Literal>>> result = computeGeneric(handler, formulaForComputation);
+        if (aborted(handler)) {
+            return null;
+        }
         return new PrimeResult(
                 completeImplicants ? result.first() : negateAll(result.second()),
                 completeImplicants ? result.second() : negateAll(result.first()),
                 type);
     }
 
-    private Pair<List<SortedSet<Literal>>, List<SortedSet<Literal>>> computeGeneric(final Formula formula) {
+    private Pair<List<SortedSet<Literal>>, List<SortedSet<Literal>>> computeGeneric(final OptimizationHandler handler, final Formula formula) {
         final FormulaFactory f = formula.factory();
         final SubstitutionResult sub = createSubstitution(formula);
         final SATSolver hSolver = MiniSat.miniSat(f, MiniSatConfig.builder().cnfMethod(MiniSatConfig.CNFMethod.PG_ON_SOLVER).build());
@@ -126,8 +147,11 @@ public final class PrimeCompiler {
         final List<SortedSet<Literal>> primeImplicates = new ArrayList<>();
         while (true) {
             final Assignment hModel = hSolver.execute(this.computeWithMaximization
-                    ? OptimizationFunction.maximize(sub.newVar2oldLit.keySet())
-                    : OptimizationFunction.minimize(sub.newVar2oldLit.keySet()));
+                    ? OptimizationFunction.builder().handler(handler).literals(sub.newVar2oldLit.keySet()).maximize().build()
+                    : OptimizationFunction.builder().handler(handler).literals(sub.newVar2oldLit.keySet()).minimize().build());
+            if (aborted(handler)) {
+                return null;
+            }
             if (hModel == null) {
                 return new Pair<>(primeImplicants, primeImplicates);
             }
