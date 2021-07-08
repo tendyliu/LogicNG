@@ -36,6 +36,8 @@ import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.FormulaTransformation;
 import org.logicng.formulas.Literal;
+import org.logicng.handlers.AdvancedSimplifierHandler;
+import org.logicng.handlers.SmusHandler;
 import org.logicng.primecomputation.PrimeCompiler;
 import org.logicng.primecomputation.PrimeResult;
 import org.logicng.util.FormulaHelper;
@@ -61,11 +63,12 @@ import java.util.stream.Collectors;
  *     <li>Factoring out: Applying the Distributive Law heuristically for a smaller formula</li>
  *     <li>Minimizing negations: Applying De Morgan's Law heuristically for a smaller formula</li>
  * </ul>
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public final class AdvancedSimplifier implements FormulaTransformation {
 
+    private final AdvancedSimplifierHandler handler;
     private final RatingFunction<?> ratingFunction;
 
     /**
@@ -73,13 +76,29 @@ public final class AdvancedSimplifier implements FormulaTransformation {
      * @param ratingFunction the rating function
      */
     public AdvancedSimplifier(final RatingFunction<?> ratingFunction) {
+        this(null, ratingFunction);
+    }
+
+    /**
+     * Constructs a new simplifier with the given handler and rating functions.
+     * @param handler        the handler
+     * @param ratingFunction the rating function
+     */
+    public AdvancedSimplifier(final AdvancedSimplifierHandler handler, final RatingFunction<?> ratingFunction) {
+        this.handler = handler;
         this.ratingFunction = ratingFunction;
     }
 
     @Override
     public Formula apply(final Formula formula, final boolean cache) {
+        if (this.handler != null) {
+            this.handler.started();
+        }
         final FormulaFactory f = formula.factory();
         final Backbone backbone = BackboneGeneration.compute(formula, formula.variables());
+        if (handler != null && !handler.computedBackbone()) {
+            return null;
+        }
         if (!backbone.isSat()) {
             return f.falsum();
         }
@@ -87,10 +106,21 @@ public final class AdvancedSimplifier implements FormulaTransformation {
         final Formula restrictedFormula = formula.restrict(new Assignment(backboneLiterals));
         final List<SortedSet<Literal>> primeImplicants = PrimeCompiler.getWithMinimization()
                 .compute(restrictedFormula, PrimeResult.CoverageType.IMPLICANTS_COMPLETE).getPrimeImplicants();
-        final List<Formula> minimizedPIs = SmusComputation.computeSmusForFormulas(negateAllLiterals(primeImplicants, f), Collections.singletonList(restrictedFormula), f);
+        if (handler != null && !handler.computedPrimeImplicants()) {
+            return null;
+        }
+        final SmusHandler smusHandler = handler == null ? null : handler.smusHandler();
+        final List<Formula> minimizedPIs = SmusComputation.computeSmusForFormulas(smusHandler, negateAllLiterals(primeImplicants, f),
+                Collections.singletonList(restrictedFormula), f);
+        if (handler != null && (handler.aborted() || !handler.computedSmus())) {
+            return null;
+        }
         assert minimizedPIs != null : "The conjunction of a satisfiable formula and its negated prime implications is always a contradiction";
         final Formula minDnf = f.or(negateAllLiteralsInFormulas(minimizedPIs, f).stream().map(f::and).collect(Collectors.toList()));
         final Formula fullFactor = minDnf.transform(new FactorOutSimplifier(this.ratingFunction));
+        if (handler != null && !handler.computedFactorOutSimplification()) {
+            return null;
+        }
         return f.and(f.and(backboneLiterals), fullFactor).transform(new NegationSimplifier());
     }
 
