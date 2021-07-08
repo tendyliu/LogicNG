@@ -35,14 +35,21 @@ import org.logicng.RandomTag;
 import org.logicng.TestWithExampleFormulas;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
+import org.logicng.handlers.OptimizationHandler;
+import org.logicng.handlers.TimeoutHandler;
+import org.logicng.handlers.TimeoutOptimizationHandler;
+import org.logicng.io.parsers.ParserException;
 import org.logicng.predicates.satisfiability.TautologyPredicate;
 import org.logicng.util.FormulaCornerCases;
 import org.logicng.util.FormulaRandomizer;
 import org.logicng.util.FormulaRandomizerConfig;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Unit Tests for the class {@link AdvancedSimplifier}.
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public class SimplifierTest extends TestWithExampleFormulas {
@@ -72,10 +79,48 @@ public class SimplifierTest extends TestWithExampleFormulas {
         }
     }
 
+    @Test
+    public void testTimeoutHandlerSmall() throws ParserException {
+        final List<TimeoutOptimizationHandler> handlers = Arrays.asList(
+                new TimeoutOptimizationHandler(5_000L, TimeoutHandler.TimerType.SINGLE_TIMEOUT),
+                new TimeoutOptimizationHandler(5_000L, TimeoutHandler.TimerType.RESTARTING_TIMEOUT),
+                new TimeoutOptimizationHandler(System.currentTimeMillis() + 5_000L, TimeoutHandler.TimerType.FIXED_END)
+        );
+        final Formula formula = f.parse("a & b | ~c & a");
+        for (final TimeoutOptimizationHandler handler : handlers) {
+            testHandler(handler, formula, false);
+        }
+    }
+
+    @Test
+    public void testTimeoutHandlerLarge() {
+        final List<TimeoutOptimizationHandler> handlers = Arrays.asList(
+                new TimeoutOptimizationHandler(1L, TimeoutHandler.TimerType.SINGLE_TIMEOUT),
+                new TimeoutOptimizationHandler(1L, TimeoutHandler.TimerType.RESTARTING_TIMEOUT),
+                new TimeoutOptimizationHandler(System.currentTimeMillis() + 1L, TimeoutHandler.TimerType.FIXED_END)
+        );
+        final FormulaRandomizer random = new FormulaRandomizer(this.f, FormulaRandomizerConfig.builder().numVars(15).seed(42).build());
+        final Formula formula = random.formula(5);
+        for (final TimeoutOptimizationHandler handler : handlers) {
+            testHandler(handler, formula, true);
+        }
+    }
+
     private void computeAndVerify(final Formula formula) {
         final Formula simplified = formula.transform(this.simplifier);
         assertThat(formula.factory().equivalence(formula, simplified).holds(new TautologyPredicate(this.f)))
                 .as("Minimized formula is equivalent to original Formula")
                 .isTrue();
+    }
+
+    private void testHandler(final OptimizationHandler handler, final Formula formula, final boolean expAborted) {
+        final AdvancedSimplifier simplifierWithHandler = new AdvancedSimplifier(handler, new DefaultRatingFunction());
+        final Formula simplified = formula.transform(simplifierWithHandler);
+        assertThat(handler.aborted()).isEqualTo(expAborted);
+        if (expAborted) {
+            assertThat(simplified).isNull();
+        } else {
+            assertThat(simplified).isNotNull();
+        }
     }
 }
