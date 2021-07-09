@@ -52,7 +52,7 @@ import java.util.List;
  * @version 2.1.0
  * @since 2.0.0
  */
-public class SimplifierTest extends TestWithExampleFormulas {
+public class AdvancedSimplifierTest extends TestWithExampleFormulas {
 
     private final AdvancedSimplifier simplifier = new AdvancedSimplifier(new DefaultRatingFunction());
 
