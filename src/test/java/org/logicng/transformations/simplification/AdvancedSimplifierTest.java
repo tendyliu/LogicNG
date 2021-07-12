@@ -112,14 +112,14 @@ public class AdvancedSimplifierTest extends TestWithExampleFormulas {
     @Test
     public void testPrimeCompilerIsCancelled() throws ParserException {
         final OptimizationHandler handler = new CustomOptimizationHandler(0);
-        final Formula formula = f.parse("A & (B | C)");
+        final Formula formula = f.parse("a&(b|c)");
         testHandler(handler, formula, true);
     }
 
     @Test
     public void testSmusComputationIsCancelled() throws ParserException {
         final OptimizationHandler handler = new CustomOptimizationHandler(5);
-        final Formula formula = f.parse("A & (B | C)");
+        final Formula formula = f.parse("a&(b|c)");
         testHandler(handler, formula, true);
     }
 
@@ -141,7 +141,7 @@ public class AdvancedSimplifierTest extends TestWithExampleFormulas {
         }
     }
 
-    private static class CustomOptimizationHandler implements OptimizationHandler {
+    public static class CustomOptimizationHandler implements OptimizationHandler {
         private final int maxNumBounds;
         private int numFoundBounds;
         private boolean aborted;

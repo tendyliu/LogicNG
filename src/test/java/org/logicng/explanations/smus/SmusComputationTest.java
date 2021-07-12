@@ -38,6 +38,7 @@ import org.logicng.handlers.OptimizationHandler;
 import org.logicng.handlers.TimeoutHandler;
 import org.logicng.handlers.TimeoutOptimizationHandler;
 import org.logicng.io.parsers.ParserException;
+import org.logicng.transformations.simplification.AdvancedSimplifierTest;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -269,6 +270,27 @@ public class SmusComputationTest extends TestWithExampleFormulas {
         for (final TimeoutOptimizationHandler handler : handlers) {
             testHandler(handler, formulas, true);
         }
+    }
+
+    @Test
+    public void testMinimumHittingSetCancelled() throws ParserException {
+        final OptimizationHandler handler = new AdvancedSimplifierTest.CustomOptimizationHandler(0);
+        final List<Formula> formulas = Arrays.asList(
+                this.f.parse("a"),
+                this.f.parse("~a")
+        );
+        testHandler(handler, formulas, true);
+    }
+
+    @Test
+    public void testHSolverCancelled() throws ParserException {
+        final OptimizationHandler handler = new AdvancedSimplifierTest.CustomOptimizationHandler(3);
+        final List<Formula> formulas = Arrays.asList(
+                this.f.parse("a"),
+                this.f.parse("~a"),
+                this.f.parse("c")
+        );
+        testHandler(handler, formulas, true);
     }
 
     private void testHandler(final OptimizationHandler handler, final List<Formula> formulas, final boolean expAborted) {
