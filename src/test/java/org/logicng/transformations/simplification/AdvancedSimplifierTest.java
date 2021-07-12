@@ -33,9 +33,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.logicng.RandomTag;
 import org.logicng.TestWithExampleFormulas;
+import org.logicng.datastructures.Assignment;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.handlers.OptimizationHandler;
+import org.logicng.handlers.SATHandler;
 import org.logicng.handlers.TimeoutHandler;
 import org.logicng.handlers.TimeoutOptimizationHandler;
 import org.logicng.io.parsers.ParserException;
@@ -46,6 +48,7 @@ import org.logicng.util.FormulaRandomizerConfig;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Unit Tests for the class {@link AdvancedSimplifier}.
@@ -106,6 +109,20 @@ public class AdvancedSimplifierTest extends TestWithExampleFormulas {
         }
     }
 
+    @Test
+    public void testPrimeCompilerIsCancelled() throws ParserException {
+        final OptimizationHandler handler = new CustomOptimizationHandler(0);
+        final Formula formula = f.parse("A & (B | C)");
+        testHandler(handler, formula, true);
+    }
+
+    @Test
+    public void testSmusComputationIsCancelled() throws ParserException {
+        final OptimizationHandler handler = new CustomOptimizationHandler(5);
+        final Formula formula = f.parse("A & (B | C)");
+        testHandler(handler, formula, true);
+    }
+
     private void computeAndVerify(final Formula formula) {
         final Formula simplified = formula.transform(this.simplifier);
         assertThat(formula.factory().equivalence(formula, simplified).holds(new TautologyPredicate(this.f)))
@@ -121,6 +138,33 @@ public class AdvancedSimplifierTest extends TestWithExampleFormulas {
             assertThat(simplified).isNull();
         } else {
             assertThat(simplified).isNotNull();
+        }
+    }
+
+    private static class CustomOptimizationHandler implements OptimizationHandler {
+        private final int maxNumBounds;
+        private int numFoundBounds;
+        private boolean aborted;
+
+        public CustomOptimizationHandler(final int maxNumBounds) {
+            this.maxNumBounds = maxNumBounds;
+            this.numFoundBounds = 0;
+        }
+
+        @Override
+        public SATHandler satHandler() {
+            return null;
+        }
+
+        @Override
+        public boolean aborted() {
+            return this.aborted;
+        }
+
+        @Override
+        public boolean foundBetterBound(final Supplier<Assignment> currentResultProvider) {
+            this.aborted = ++numFoundBounds >= maxNumBounds;
+            return !this.aborted;
         }
     }
 }
