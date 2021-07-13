@@ -34,11 +34,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 import org.logicng.TestWithExampleFormulas;
 import org.logicng.formulas.Formula;
+import org.logicng.handlers.CustomOptimizationHandler;
 import org.logicng.handlers.OptimizationHandler;
 import org.logicng.handlers.TimeoutHandler;
 import org.logicng.handlers.TimeoutOptimizationHandler;
 import org.logicng.io.parsers.ParserException;
-import org.logicng.transformations.simplification.AdvancedSimplifierTest;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -274,7 +274,7 @@ public class SmusComputationTest extends TestWithExampleFormulas {
 
     @Test
     public void testMinimumHittingSetCancelled() throws ParserException {
-        final OptimizationHandler handler = new AdvancedSimplifierTest.CustomOptimizationHandler(0);
+        final OptimizationHandler handler = new CustomOptimizationHandler(0);
         final List<Formula> formulas = Arrays.asList(
                 this.f.parse("a"),
                 this.f.parse("~a")
@@ -284,7 +284,7 @@ public class SmusComputationTest extends TestWithExampleFormulas {
 
     @Test
     public void testHSolverCancelled() throws ParserException {
-        final OptimizationHandler handler = new AdvancedSimplifierTest.CustomOptimizationHandler(3);
+        final OptimizationHandler handler = new CustomOptimizationHandler(3);
         final List<Formula> formulas = Arrays.asList(
                 this.f.parse("a"),
                 this.f.parse("~a"),

@@ -37,12 +37,12 @@ import org.logicng.TestWithExampleFormulas;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Literal;
+import org.logicng.handlers.CustomOptimizationHandler;
 import org.logicng.handlers.OptimizationHandler;
 import org.logicng.handlers.TimeoutHandler;
 import org.logicng.handlers.TimeoutOptimizationHandler;
 import org.logicng.io.parsers.ParserException;
 import org.logicng.predicates.satisfiability.TautologyPredicate;
-import org.logicng.transformations.simplification.AdvancedSimplifierTest;
 import org.logicng.util.FormulaCornerCases;
 import org.logicng.util.FormulaRandomizer;
 import org.logicng.util.FormulaRandomizerConfig;
@@ -176,7 +176,7 @@ public class PrimeCompilerTest extends TestWithExampleFormulas {
                 new Pair<>(PrimeCompiler.getWithMinimization(), PrimeResult.CoverageType.IMPLICANTS_COMPLETE),
                 new Pair<>(PrimeCompiler.getWithMinimization(), PrimeResult.CoverageType.IMPLICATES_COMPLETE));
         for (final Pair<PrimeCompiler, PrimeResult.CoverageType> compiler : compilers) {
-            final OptimizationHandler handler = new AdvancedSimplifierTest.CustomOptimizationHandler(0);
+            final OptimizationHandler handler = new CustomOptimizationHandler(0);
             final Formula formula = f.parse("a&(b|c)");
             testHandler(handler, formula, compiler.first(), compiler.second(), true);
         }
