@@ -93,7 +93,7 @@ public final class NaivePrimeReduction {
         final SortedSet<Literal> primeImplicant = new TreeSet<>(implicant);
         for (final Literal lit : implicant) {
             primeImplicant.remove(lit);
-            final boolean sat = this.implicantSolver.sat(primeImplicant) == Tristate.TRUE;
+            final boolean sat = this.implicantSolver.sat(handler, primeImplicant) == Tristate.TRUE;
             if (aborted(handler)) {
                 return null;
             }
@@ -129,7 +129,7 @@ public final class NaivePrimeReduction {
         for (final Literal lit : implicate) {
             primeImplicate.remove(lit);
             final List<Literal> assumptions = FormulaHelper.negateLiterals(primeImplicate, ArrayList::new);
-            final boolean sat = this.implicateSolver.sat(assumptions) == Tristate.TRUE;
+            final boolean sat = this.implicateSolver.sat(handler, assumptions) == Tristate.TRUE;
             if (aborted(handler)) {
                 return null;
             }

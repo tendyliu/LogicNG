@@ -834,6 +834,9 @@ public abstract class MiniSatStyleSolver {
      */
     public Backbone computeBackbone(final Collection<Variable> variables, final BackboneType type, final SATHandler handler) {
         final boolean sat = solve(handler) == Tristate.TRUE;
+        if (aborted(handler)) {
+            return null;
+        }
         if (sat) {
             this.computingBackbone = true;
             final List<Integer> relevantVarIndices = getRelevantVarIndices(variables);
