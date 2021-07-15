@@ -35,7 +35,7 @@ import org.logicng.RandomTag;
 import org.logicng.TestWithExampleFormulas;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
-import org.logicng.handlers.CustomOptimizationHandler;
+import org.logicng.handlers.BoundedOptimizationHandler;
 import org.logicng.handlers.OptimizationHandler;
 import org.logicng.handlers.TimeoutHandler;
 import org.logicng.handlers.TimeoutOptimizationHandler;
@@ -109,14 +109,14 @@ public class AdvancedSimplifierTest extends TestWithExampleFormulas {
 
     @Test
     public void testPrimeCompilerIsCancelled() throws ParserException {
-        final OptimizationHandler handler = new CustomOptimizationHandler(0);
+        final OptimizationHandler handler = new BoundedOptimizationHandler(-1, 0);
         final Formula formula = f.parse("a&(b|c)");
         testHandler(handler, formula, true);
     }
 
     @Test
     public void testSmusComputationIsCancelled() throws ParserException {
-        final OptimizationHandler handler = new CustomOptimizationHandler(5);
+        final OptimizationHandler handler = new BoundedOptimizationHandler(-1, 5);
         final Formula formula = f.parse("a&(b|c)");
         testHandler(handler, formula, true);
     }
