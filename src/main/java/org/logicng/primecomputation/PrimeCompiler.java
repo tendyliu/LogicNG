@@ -165,7 +165,10 @@ public final class PrimeCompiler {
                 return null;
             }
             if (fSat == Tristate.FALSE) {
-                final SortedSet<Literal> primeImplicant = this.computeWithMaximization ? primeReduction.reduceImplicant(fModel.literals()) : fModel.literals();
+                final SortedSet<Literal> primeImplicant = this.computeWithMaximization ? primeReduction.reduceImplicant(fModel.literals(), satHandler(handler)) : fModel.literals();
+                if (aborted(handler)) {
+                    return null;
+                }
                 primeImplicants.add(primeImplicant);
                 final List<Literal> blockingClause = new ArrayList<>();
                 for (final Literal lit : primeImplicant) {
@@ -177,7 +180,10 @@ public final class PrimeCompiler {
                 for (final Literal lit : (this.computeWithMaximization ? fModel : fSolver.model(formula.variables())).literals()) {
                     implicate.add(lit.negate());
                 }
-                final SortedSet<Literal> primeImplicate = primeReduction.reduceImplicate(implicate);
+                final SortedSet<Literal> primeImplicate = primeReduction.reduceImplicate(implicate, satHandler(handler));
+                if (aborted(handler)) {
+                    return null;
+                }
                 primeImplicates.add(primeImplicate);
                 hSolver.add(f.or(primeImplicate).transform(sub.substitution));
             }
