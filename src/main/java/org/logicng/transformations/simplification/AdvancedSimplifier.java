@@ -32,6 +32,7 @@ import static org.logicng.handlers.Handler.aborted;
 import static org.logicng.handlers.Handler.start;
 
 import org.logicng.backbones.Backbone;
+import org.logicng.backbones.BackboneGeneration;
 import org.logicng.backbones.BackboneType;
 import org.logicng.datastructures.Assignment;
 import org.logicng.explanations.smus.SmusComputation;
@@ -43,9 +44,6 @@ import org.logicng.handlers.OptimizationHandler;
 import org.logicng.handlers.SATHandler;
 import org.logicng.primecomputation.PrimeCompiler;
 import org.logicng.primecomputation.PrimeResult;
-import org.logicng.solvers.MiniSat;
-import org.logicng.solvers.functions.BackboneFunction;
-import org.logicng.solvers.sat.MiniSatConfig;
 import org.logicng.util.FormulaHelper;
 
 import java.util.ArrayList;
@@ -127,9 +125,7 @@ public final class AdvancedSimplifier implements FormulaTransformation {
 
     private Backbone computeBackbone(final Formula formula) {
         final SATHandler satHandler = handler == null ? null : handler.satHandler();
-        final MiniSat miniSat = MiniSat.miniSat(formula.factory(), MiniSatConfig.builder().cnfMethod(MiniSatConfig.CNFMethod.PG_ON_SOLVER).build());
-        miniSat.add(formula);
-        return miniSat.execute(BackboneFunction.builder().handler(satHandler).variables(formula.variables()).type(BackboneType.POSITIVE_AND_NEGATIVE).build());
+        return BackboneGeneration.compute(Collections.singletonList(formula), formula.variables(), BackboneType.POSITIVE_AND_NEGATIVE, satHandler);
     }
 
     private List<Formula> negateAllLiterals(final Collection<SortedSet<Literal>> literalSets, final FormulaFactory f) {
