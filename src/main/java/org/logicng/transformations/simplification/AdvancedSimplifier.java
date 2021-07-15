@@ -30,6 +30,7 @@ package org.logicng.transformations.simplification;
 
 import static org.logicng.handlers.Handler.aborted;
 import static org.logicng.handlers.Handler.start;
+import static org.logicng.handlers.OptimizationHandler.satHandler;
 
 import org.logicng.backbones.Backbone;
 import org.logicng.backbones.BackboneGeneration;
@@ -41,7 +42,6 @@ import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.FormulaTransformation;
 import org.logicng.formulas.Literal;
 import org.logicng.handlers.OptimizationHandler;
-import org.logicng.handlers.SATHandler;
 import org.logicng.primecomputation.PrimeCompiler;
 import org.logicng.primecomputation.PrimeResult;
 import org.logicng.util.FormulaHelper;
@@ -100,7 +100,7 @@ public final class AdvancedSimplifier implements FormulaTransformation {
     public Formula apply(final Formula formula, final boolean cache) {
         start(this.handler);
         final FormulaFactory f = formula.factory();
-        final Backbone backbone = computeBackbone(formula);
+        final Backbone backbone = BackboneGeneration.compute(Collections.singletonList(formula), formula.variables(), BackboneType.POSITIVE_AND_NEGATIVE, satHandler(handler));
         if (aborted(handler)) {
             return null;
         }
@@ -124,11 +124,6 @@ public final class AdvancedSimplifier implements FormulaTransformation {
         final Formula minDnf = f.or(negateAllLiteralsInFormulas(minimizedPIs, f).stream().map(f::and).collect(Collectors.toList()));
         final Formula fullFactor = minDnf.transform(new FactorOutSimplifier(this.ratingFunction));
         return f.and(f.and(backboneLiterals), fullFactor).transform(new NegationSimplifier());
-    }
-
-    private Backbone computeBackbone(final Formula formula) {
-        final SATHandler satHandler = handler == null ? null : handler.satHandler();
-        return BackboneGeneration.compute(Collections.singletonList(formula), formula.variables(), BackboneType.POSITIVE_AND_NEGATIVE, satHandler);
     }
 
     private List<Formula> negateAllLiterals(final Collection<SortedSet<Literal>> literalSets, final FormulaFactory f) {

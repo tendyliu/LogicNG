@@ -30,6 +30,7 @@ package org.logicng.primecomputation;
 
 import static org.logicng.handlers.Handler.aborted;
 import static org.logicng.handlers.Handler.start;
+import static org.logicng.handlers.OptimizationHandler.satHandler;
 
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Tristate;
@@ -118,7 +119,7 @@ public final class PrimeCompiler {
      * be complete, the other one will still be a cover of the given formula.
      * <p>
      * The prime compiler can be called with an {@link OptimizationHandler}. The given handler instance will be used for every subsequent
-     * {@link org.logicng.solvers.functions.OptimizationFunction} call.
+     * {@link org.logicng.solvers.functions.OptimizationFunction} call and the handler's SAT handler is used for every subsequent SAT call.
      * @param formula the formula
      * @param type    the coverage type
      * @param handler the handler, can be {@code null}
@@ -159,7 +160,10 @@ public final class PrimeCompiler {
                 return new Pair<>(primeImplicants, primeImplicates);
             }
             final Assignment fModel = transformModel(hModel, sub.newVar2oldLit);
-            final Tristate fSat = fSolver.sat(fModel.literals());
+            final Tristate fSat = fSolver.sat(satHandler(handler), fModel.literals());
+            if (aborted(handler)) {
+                return null;
+            }
             if (fSat == Tristate.FALSE) {
                 final SortedSet<Literal> primeImplicant = this.computeWithMaximization ? primeReduction.reduceImplicant(fModel.literals()) : fModel.literals();
                 primeImplicants.add(primeImplicant);

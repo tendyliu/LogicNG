@@ -30,6 +30,7 @@ package org.logicng.explanations.smus;
 
 import static org.logicng.handlers.Handler.aborted;
 import static org.logicng.handlers.Handler.start;
+import static org.logicng.handlers.OptimizationHandler.satHandler;
 
 import org.logicng.datastructures.Assignment;
 import org.logicng.datastructures.Tristate;
@@ -89,7 +90,7 @@ public final class SmusComputation {
      * Computes the SMUS for the given list of propositions modulo some additional constraint.
      * <p>
      * The SMUS computation can be called with an {@link OptimizationHandler}. The given handler instance will be used for every subsequent
-     * * {@link org.logicng.solvers.functions.OptimizationFunction} call.
+     * * {@link org.logicng.solvers.functions.OptimizationFunction} call and the handler's SAT handler is used for every subsequent SAT call.
      * @param <P>                   the subtype of the propositions
      * @param propositions          the propositions
      * @param additionalConstraints the additional constraints
@@ -102,7 +103,11 @@ public final class SmusComputation {
         start(handler);
         final SATSolver growSolver = MiniSat.miniSat(f);
         growSolver.add(additionalConstraints == null ? Collections.singletonList(f.verum()) : additionalConstraints);
-        if (growSolver.sat() == Tristate.FALSE) {
+        boolean sat = growSolver.sat(satHandler(handler)) == Tristate.TRUE;
+        if (aborted(handler)) {
+            return null;
+        }
+        if (!sat) {
             throw new IllegalArgumentException("Cannot compute a smallest MUS for a set of unsatisfiable additional constraints.");
         }
         final Map<Variable, P> propositionMapping = new TreeMap<>();
@@ -111,7 +116,11 @@ public final class SmusComputation {
             propositionMapping.put(selector, proposition);
             growSolver.add(f.equivalence(selector, proposition.formula()));
         }
-        if (growSolver.sat(propositionMapping.keySet()) == Tristate.TRUE) {
+        sat = growSolver.sat(satHandler(handler), propositionMapping.keySet()) == Tristate.TRUE;
+        if (aborted(handler)) {
+            return null;
+        }
+        if (sat) {
             throw new IllegalArgumentException("Cannot compute a smallest MUS for a satisfiable formula set.");
         }
         final SATSolver hSolver = MiniSat.miniSat(f);

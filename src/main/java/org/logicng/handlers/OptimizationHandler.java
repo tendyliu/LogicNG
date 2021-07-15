@@ -32,4 +32,13 @@ public interface OptimizationHandler extends Handler {
     default boolean foundBetterBound(final Supplier<Assignment> currentResultProvider) {
         return true;
     }
+
+    /**
+     * Returns a SAT handler if the optimization handler is not {@code null}.
+     * @param handler the optimization handler
+     * @return The SAT handler if the optimization handler is not {@code null}, otherwise {@code null}
+     */
+    static SATHandler satHandler(final OptimizationHandler handler) {
+        return handler == null ? null : handler.satHandler();
+    }
 }

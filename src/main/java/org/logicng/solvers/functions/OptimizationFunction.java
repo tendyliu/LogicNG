@@ -30,6 +30,7 @@ package org.logicng.solvers.functions;
 
 import static org.logicng.handlers.Handler.aborted;
 import static org.logicng.handlers.Handler.start;
+import static org.logicng.handlers.OptimizationHandler.satHandler;
 
 import org.logicng.cardinalityconstraints.CCIncrementalData;
 import org.logicng.collections.LNGBooleanVector;
@@ -43,7 +44,6 @@ import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
 import org.logicng.handlers.OptimizationHandler;
-import org.logicng.handlers.SATHandler;
 import org.logicng.solvers.MiniSat;
 import org.logicng.solvers.SolverState;
 
@@ -142,7 +142,7 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
             selectorMap.forEach((selVar, lit) -> solver.add(f.or(selVar.negate(), lit.negate())));
             selectorMap.forEach((selVar, lit) -> solver.add(f.or(lit, selVar)));
         }
-        Tristate sat = solver.sat(satHandler());
+        Tristate sat = solver.sat(satHandler(handler));
         if (sat != Tristate.TRUE || aborted(handler)) {
             return null;
         }
@@ -151,7 +151,7 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
         int currentBound = currentModel.positiveVariables().size();
         if (currentBound == 0) {
             solver.add(f.cc(CType.GE, 1, selectors));
-            sat = solver.sat(satHandler());
+            sat = solver.sat(satHandler(handler));
             if (aborted(handler)) {
                 return null;
             } else if (sat == Tristate.FALSE) {
@@ -167,7 +167,7 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
         final Formula cc = f.cc(CType.GE, currentBound + 1, selectors);
         assert cc instanceof CardinalityConstraint;
         final CCIncrementalData incrementalData = solver.addIncrementalCC((CardinalityConstraint) cc);
-        sat = solver.sat(satHandler());
+        sat = solver.sat(satHandler(handler));
         if (aborted(handler)) {
             return null;
         }
@@ -183,16 +183,12 @@ public final class OptimizationFunction implements SolverFunction<Assignment> {
                 return mkResultModel(solver, internalModel);
             }
             incrementalData.newLowerBoundForSolver(currentBound + 1);
-            sat = solver.sat(satHandler());
+            sat = solver.sat(satHandler(handler));
             if (aborted(handler)) {
                 return null;
             }
         }
         return mkResultModel(solver, internalModel);
-    }
-
-    private SATHandler satHandler() {
-        return this.handler == null ? null : this.handler.satHandler();
     }
 
     private Assignment mkResultModel(final MiniSat solver, final LNGBooleanVector internalModel) {
