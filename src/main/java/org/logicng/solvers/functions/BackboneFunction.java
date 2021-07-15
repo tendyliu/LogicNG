@@ -46,7 +46,7 @@ import java.util.function.Consumer;
  * A solver function which computes a backbone for the formula on the solver.
  * <p>
  * Backbone functions are instantiated via their builder {@link #builder()}.
- * @version 2.0.0
+ * @version 2.1.0
  * @since 2.0.0
  */
 public final class BackboneFunction implements SolverFunction<Backbone> {
