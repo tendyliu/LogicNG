@@ -75,6 +75,18 @@ public final class SmusComputation {
 
     /**
      * Computes the SMUS for the given list of propositions modulo some additional constraint.
+     * @param <P>                   the subtype of the propositions
+     * @param propositions          the propositions
+     * @param additionalConstraints the additional constraints
+     * @param f                     the formula factory
+     * @return the SMUS or {@code null} if the given propositions are satisfiable
+     */
+    public static <P extends Proposition> List<P> computeSmus(final List<P> propositions, final List<Formula> additionalConstraints, final FormulaFactory f) {
+        return computeSmus(propositions, additionalConstraints, f, null);
+    }
+
+    /**
+     * Computes the SMUS for the given list of propositions modulo some additional constraint.
      * <p>
      * The SMUS computation can be called with an {@link OptimizationHandler}. The given handler instance will be used for every subsequent
      * * {@link org.logicng.solvers.functions.OptimizationFunction} call.
