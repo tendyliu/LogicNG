@@ -122,7 +122,7 @@ class TimeoutMaxSATHandlerTest {
     }
 
     @Test
-    public void testTimeoutHandler() {
+    public void testTimeoutHandlerFixedEnd() {
         for (final MaxSATSolver solver : this.solvers) {
             final Formula ph = new PigeonHoleGenerator(this.f).generate(10);
             final int weight = solver.isWeighted() ? 2 : 1;
