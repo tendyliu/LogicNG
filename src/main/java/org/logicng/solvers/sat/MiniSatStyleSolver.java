@@ -45,6 +45,7 @@
 package org.logicng.solvers.sat;
 
 import static org.logicng.datastructures.Tristate.UNDEF;
+import static org.logicng.handlers.Handler.aborted;
 
 import org.logicng.backbones.Backbone;
 import org.logicng.backbones.BackboneType;
@@ -838,6 +839,9 @@ public abstract class MiniSatStyleSolver {
             final List<Integer> relevantVarIndices = getRelevantVarIndices(variables);
             initBackboneDS(relevantVarIndices);
             computeBackbone(relevantVarIndices, type, handler);
+            if (aborted(handler)) {
+                return null;
+            }
             final Backbone backbone = buildBackbone(variables, type);
             this.computingBackbone = false;
             return backbone;
@@ -887,7 +891,11 @@ public abstract class MiniSatStyleSolver {
         final Stack<Integer> candidates = createInitialCandidates(variables, type);
         while (candidates.size() > 0) {
             final int lit = candidates.pop();
-            if (solveWithLit(lit, handler)) {
+            final boolean sat = solveWithLit(lit, handler);
+            if (aborted(handler)) {
+                return;
+            }
+            if (sat) {
                 refineUpperBound();
             } else {
                 addBackboneLiteral(lit);

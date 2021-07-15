@@ -101,6 +101,9 @@ public final class AdvancedSimplifier implements FormulaTransformation {
         start(this.handler);
         final FormulaFactory f = formula.factory();
         final Backbone backbone = computeBackbone(formula);
+        if (aborted(handler)) {
+            return null;
+        }
         if (!backbone.isSat()) {
             return f.falsum();
         }
