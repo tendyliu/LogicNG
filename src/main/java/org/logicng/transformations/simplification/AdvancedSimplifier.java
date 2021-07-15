@@ -74,15 +74,15 @@ import java.util.stream.Collectors;
  */
 public final class AdvancedSimplifier implements FormulaTransformation {
 
-    private final OptimizationHandler handler;
     private final RatingFunction<?> ratingFunction;
+    private final OptimizationHandler handler;
 
     /**
      * Constructs a new simplifier with the given rating functions.
      * @param ratingFunction the rating function
      */
     public AdvancedSimplifier(final RatingFunction<?> ratingFunction) {
-        this(null, ratingFunction);
+        this(ratingFunction, null);
     }
 
     /**
@@ -90,10 +90,10 @@ public final class AdvancedSimplifier implements FormulaTransformation {
      * <p>
      * The simplifier can be called with an {@link OptimizationHandler}. The given handler instance will be used for every subsequent
      * {@link org.logicng.solvers.functions.OptimizationFunction} call and the handler's SAT handler is used for every subsequent SAT call.
-     * @param handler        the handler, can be {@code null}
      * @param ratingFunction the rating function
+     * @param handler        the handler, can be {@code null}
      */
-    public AdvancedSimplifier(final OptimizationHandler handler, final RatingFunction<?> ratingFunction) {
+    public AdvancedSimplifier(final RatingFunction<?> ratingFunction, final OptimizationHandler handler) {
         this.handler = handler;
         this.ratingFunction = ratingFunction;
     }
@@ -108,13 +108,14 @@ public final class AdvancedSimplifier implements FormulaTransformation {
         }
         final SortedSet<Literal> backboneLiterals = backbone.getCompleteBackbone();
         final Formula restrictedFormula = formula.restrict(new Assignment(backboneLiterals));
-        final PrimeResult primeResult = PrimeCompiler.getWithMinimization().compute(handler, restrictedFormula, PrimeResult.CoverageType.IMPLICANTS_COMPLETE);
+        final PrimeResult primeResult = PrimeCompiler.getWithMinimization().compute(restrictedFormula, PrimeResult.CoverageType.IMPLICANTS_COMPLETE, handler);
         if (aborted(this.handler)) {
             return null;
         }
         final List<SortedSet<Literal>> primeImplicants = primeResult.getPrimeImplicants();
-        final List<Formula> minimizedPIs = SmusComputation.computeSmusForFormulas(this.handler, negateAllLiterals(primeImplicants, f),
-                Collections.singletonList(restrictedFormula), f);
+        final List<Formula> minimizedPIs = SmusComputation.computeSmusForFormulas(negateAllLiterals(primeImplicants, f), Collections.singletonList(restrictedFormula), f,
+                this.handler
+        );
         if (aborted(this.handler)) {
             return null;
         }

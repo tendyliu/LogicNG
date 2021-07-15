@@ -231,7 +231,7 @@ public class PrimeCompilerTest extends TestWithExampleFormulas {
 
     private void testHandler(final OptimizationHandler handler, final Formula formula, final PrimeCompiler compiler, final PrimeResult.CoverageType coverageType,
                              final boolean expAborted) {
-        final PrimeResult result = compiler.compute(handler, formula, coverageType);
+        final PrimeResult result = compiler.compute(formula, coverageType, handler);
         assertThat(handler.aborted()).isEqualTo(expAborted);
         if (expAborted) {
             assertThat(result).isNull();

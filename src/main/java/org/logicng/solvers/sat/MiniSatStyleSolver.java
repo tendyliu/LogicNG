@@ -821,23 +821,23 @@ public abstract class MiniSatStyleSolver {
      * @return the backbone projected to the relevant variables or {@code null} if the formula on the solver with the restrictions are not satisfiable
      */
     public Backbone computeBackbone(final Collection<Variable> variables, final BackboneType type) {
-        return computeBackbone(null, variables, type);
+        return computeBackbone(variables, type, null);
     }
 
     /**
      * Computes the backbone of the given variables with respect to the formulas added to the solver.
-     * @param handler   the handler
      * @param variables variables to test
      * @param type      backbone type
+     * @param handler   the handler
      * @return the backbone projected to the relevant variables or {@code null} if the formula on the solver with the restrictions are not satisfiable
      */
-    public Backbone computeBackbone(final SATHandler handler, final Collection<Variable> variables, final BackboneType type) {
+    public Backbone computeBackbone(final Collection<Variable> variables, final BackboneType type, final SATHandler handler) {
         final boolean sat = solve(handler) == Tristate.TRUE;
         if (sat) {
             this.computingBackbone = true;
             final List<Integer> relevantVarIndices = getRelevantVarIndices(variables);
             initBackboneDS(relevantVarIndices);
-            computeBackbone(handler, relevantVarIndices, type);
+            computeBackbone(relevantVarIndices, type, handler);
             final Backbone backbone = buildBackbone(variables, type);
             this.computingBackbone = false;
             return backbone;
@@ -879,15 +879,15 @@ public abstract class MiniSatStyleSolver {
 
     /**
      * Computes the backbone for the given variables.
-     * @param handler   the handler
      * @param variables variables to test
      * @param type      the type of the backbone
+     * @param handler   the handler
      */
-    protected void computeBackbone(final SATHandler handler, final List<Integer> variables, final BackboneType type) {
+    protected void computeBackbone(final List<Integer> variables, final BackboneType type, final SATHandler handler) {
         final Stack<Integer> candidates = createInitialCandidates(variables, type);
         while (candidates.size() > 0) {
             final int lit = candidates.pop();
-            if (solveWithLit(handler, lit)) {
+            if (solveWithLit(lit, handler)) {
                 refineUpperBound();
             } else {
                 addBackboneLiteral(lit);
@@ -938,11 +938,11 @@ public abstract class MiniSatStyleSolver {
 
     /**
      * Tests the given literal with the formula on the solver for satisfiability.
-     * @param handler the handler
      * @param lit     literal to test
+     * @param handler the handler
      * @return {@code true} if satisfiable, otherwise {@code false}
      */
-    protected boolean solveWithLit(final SATHandler handler, final int lit) {
+    protected boolean solveWithLit(final int lit, final SATHandler handler) {
         this.backboneAssumptions.push(not(lit));
         final boolean sat = solve(handler, this.backboneAssumptions) == Tristate.TRUE;
         this.backboneAssumptions.pop();

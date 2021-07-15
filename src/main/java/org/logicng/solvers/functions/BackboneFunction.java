@@ -76,7 +76,7 @@ public final class BackboneFunction implements SolverFunction<Backbone> {
         if (solver.getStyle() == MiniSat.SolverStyle.MINISAT && solver.isIncremental()) {
             stateBeforeBackbone = solver.saveState();
         }
-        final Backbone backbone = solver.underlyingSolver().computeBackbone(handler, this.variables, this.type);
+        final Backbone backbone = solver.underlyingSolver().computeBackbone(this.variables, this.type, handler);
         if (solver.getStyle() == MiniSat.SolverStyle.MINISAT && solver.isIncremental()) {
             solver.loadState(stateBeforeBackbone);
         }

@@ -294,7 +294,7 @@ public class SmusComputationTest extends TestWithExampleFormulas {
     }
 
     private void testHandler(final OptimizationHandler handler, final List<Formula> formulas, final boolean expAborted) {
-        final List<Formula> result = SmusComputation.computeSmusForFormulas(handler, formulas, Collections.emptyList(), f);
+        final List<Formula> result = SmusComputation.computeSmusForFormulas(formulas, Collections.emptyList(), f, handler);
         assertThat(handler.aborted()).isEqualTo(expAborted);
         if (expAborted) {
             assertThat(result).isNull();

@@ -109,7 +109,7 @@ public final class PrimeCompiler {
      * @return the prime result
      */
     public PrimeResult compute(final Formula formula, final PrimeResult.CoverageType type) {
-        return compute(null, formula, type);
+        return compute(formula, type, null);
     }
 
     /**
@@ -119,16 +119,16 @@ public final class PrimeCompiler {
      * <p>
      * The prime compiler can be called with an {@link OptimizationHandler}. The given handler instance will be used for every subsequent
      * {@link org.logicng.solvers.functions.OptimizationFunction} call.
-     * @param handler the handler, can be {@code null}
      * @param formula the formula
      * @param type    the coverage type
+     * @param handler the handler, can be {@code null}
      * @return the prime result
      */
-    public PrimeResult compute(final OptimizationHandler handler, final Formula formula, final PrimeResult.CoverageType type) {
+    public PrimeResult compute(final Formula formula, final PrimeResult.CoverageType type, final OptimizationHandler handler) {
         start(handler);
         final boolean completeImplicants = type == PrimeResult.CoverageType.IMPLICANTS_COMPLETE;
         final Formula formulaForComputation = completeImplicants ? formula : formula.negate();
-        final Pair<List<SortedSet<Literal>>, List<SortedSet<Literal>>> result = computeGeneric(handler, formulaForComputation);
+        final Pair<List<SortedSet<Literal>>, List<SortedSet<Literal>>> result = computeGeneric(formulaForComputation, handler);
         if (aborted(handler)) {
             return null;
         }
@@ -138,7 +138,7 @@ public final class PrimeCompiler {
                 type);
     }
 
-    private Pair<List<SortedSet<Literal>>, List<SortedSet<Literal>>> computeGeneric(final OptimizationHandler handler, final Formula formula) {
+    private Pair<List<SortedSet<Literal>>, List<SortedSet<Literal>>> computeGeneric(final Formula formula, final OptimizationHandler handler) {
         final FormulaFactory f = formula.factory();
         final SubstitutionResult sub = createSubstitution(formula);
         final SATSolver hSolver = MiniSat.miniSat(f, MiniSatConfig.builder().cnfMethod(MiniSatConfig.CNFMethod.PG_ON_SOLVER).build());
