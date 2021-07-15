@@ -33,7 +33,7 @@ package org.logicng.handlers;
  * @version 2.1.0
  * @since 1.0
  */
-public final class TimeoutSATHandler extends TimeoutHandler implements SATHandler {
+public class TimeoutSATHandler extends TimeoutHandler implements SATHandler {
 
     /**
      * Constructs a new timeout handler with a given timeout and a timeout type. The interpretation of the timeout depends on the timeout type:

@@ -35,7 +35,7 @@ import org.logicng.datastructures.Assignment;
  * @version 2.1.0
  * @since 1.0
  */
-public final class TimeoutMaxSATHandler extends TimeoutHandler implements MaxSATHandler {
+public class TimeoutMaxSATHandler extends TimeoutHandler implements MaxSATHandler {
 
     private TimeoutSATHandler satHandler;
     private int currentLb;

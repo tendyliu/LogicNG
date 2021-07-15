@@ -51,6 +51,7 @@ package org.logicng.solvers.maxsat.algorithms;
 
 import static org.logicng.datastructures.Tristate.FALSE;
 import static org.logicng.datastructures.Tristate.UNDEF;
+import static org.logicng.handlers.Handler.aborted;
 import static org.logicng.solvers.maxsat.algorithms.MaxSATConfig.Verbosity;
 import static org.logicng.solvers.maxsat.algorithms.MaxSATConfig.WeightStrategy;
 import static org.logicng.solvers.sat.MiniSatStyleSolver.not;
@@ -61,6 +62,7 @@ import org.logicng.collections.LNGBooleanVector;
 import org.logicng.collections.LNGIntVector;
 import org.logicng.collections.LNGVector;
 import org.logicng.datastructures.Tristate;
+import org.logicng.handlers.SATHandler;
 import org.logicng.solvers.maxsat.encodings.Encoder;
 import org.logicng.util.Pair;
 
@@ -345,8 +347,9 @@ public class IncWBO extends WBO {
                     this.assumptions.push(not(this.softClauses.get(i).assumptionVar()));
                 }
             }
-            final Tristate res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-            if (res == UNDEF) {
+            final SATHandler satHandler = satHandler();
+            final Tristate res = searchSATSolver(this.solver, satHandler, this.assumptions);
+            if (aborted(satHandler)) {
                 return MaxSATResult.UNDEF;
             } else if (res == FALSE) {
                 this.nbCores++;
@@ -442,8 +445,9 @@ public class IncWBO extends WBO {
                     this.assumptions.push(not(this.softClauses.get(i).assumptionVar()));
                 }
             }
-            final Tristate res = searchSATSolver(this.solver, satHandler(), this.assumptions);
-            if (res == UNDEF) {
+            final SATHandler satHandler = satHandler();
+            final Tristate res = searchSATSolver(this.solver, satHandler, this.assumptions);
+            if (aborted(satHandler)) {
                 return MaxSATResult.UNDEF;
             } else if (res == FALSE) {
                 this.nbCores++;

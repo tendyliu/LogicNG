@@ -49,10 +49,12 @@
 
 package org.logicng.solvers.maxsat.algorithms;
 
+import static org.logicng.handlers.Handler.aborted;
 import static org.logicng.solvers.sat.MiniSatStyleSolver.not;
 
 import org.logicng.collections.LNGIntVector;
 import org.logicng.datastructures.Tristate;
+import org.logicng.handlers.SATHandler;
 import org.logicng.solvers.maxsat.encodings.Encoder;
 import org.logicng.solvers.sat.MiniSatStyleSolver;
 
@@ -118,8 +120,9 @@ public class LinearUS extends MaxSAT {
         final LNGIntVector assumptions = new LNGIntVector();
         this.encoder.setIncremental(MaxSATConfig.IncrementalStrategy.NONE);
         while (true) {
-            res = searchSATSolver(this.solver, satHandler(), assumptions);
-            if (res == Tristate.UNDEF) {
+            final SATHandler satHandler = satHandler();
+            res = searchSATSolver(this.solver, satHandler, assumptions);
+            if (aborted(satHandler)) {
                 return MaxSATResult.UNDEF;
             } else if (res == Tristate.TRUE) {
                 this.nbSatisfiable++;
@@ -174,8 +177,9 @@ public class LinearUS extends MaxSAT {
         final LNGIntVector assumptions = new LNGIntVector();
         this.encoder.setIncremental(MaxSATConfig.IncrementalStrategy.ITERATIVE);
         while (true) {
-            res = searchSATSolver(this.solver, satHandler(), assumptions);
-            if (res == Tristate.UNDEF) {
+            final SATHandler satHandler = satHandler();
+            res = searchSATSolver(this.solver, satHandler, assumptions);
+            if (aborted(satHandler)) {
                 return MaxSATResult.UNDEF;
             } else if (res == Tristate.TRUE) {
                 this.nbSatisfiable++;
