@@ -32,7 +32,7 @@ import static org.logicng.handlers.Handler.aborted;
 import static org.logicng.handlers.Handler.start;
 
 import org.logicng.backbones.Backbone;
-import org.logicng.backbones.BackboneGeneration;
+import org.logicng.backbones.BackboneType;
 import org.logicng.datastructures.Assignment;
 import org.logicng.explanations.smus.SmusComputation;
 import org.logicng.formulas.Formula;
@@ -40,8 +40,12 @@ import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.FormulaTransformation;
 import org.logicng.formulas.Literal;
 import org.logicng.handlers.OptimizationHandler;
+import org.logicng.handlers.SATHandler;
 import org.logicng.primecomputation.PrimeCompiler;
 import org.logicng.primecomputation.PrimeResult;
+import org.logicng.solvers.MiniSat;
+import org.logicng.solvers.functions.BackboneFunction;
+import org.logicng.solvers.sat.MiniSatConfig;
 import org.logicng.util.FormulaHelper;
 
 import java.util.ArrayList;
@@ -85,7 +89,7 @@ public final class AdvancedSimplifier implements FormulaTransformation {
      * Constructs a new simplifier with the given handler and rating functions.
      * <p>
      * The simplifier can be called with an {@link OptimizationHandler}. The given handler instance will be used for every subsequent
-     * {@link org.logicng.solvers.functions.OptimizationFunction} call.
+     * {@link org.logicng.solvers.functions.OptimizationFunction} call and the handler's SAT handler is used for every subsequent SAT call.
      * @param handler        the handler, can be {@code null}
      * @param ratingFunction the rating function
      */
@@ -98,7 +102,7 @@ public final class AdvancedSimplifier implements FormulaTransformation {
     public Formula apply(final Formula formula, final boolean cache) {
         start(this.handler);
         final FormulaFactory f = formula.factory();
-        final Backbone backbone = BackboneGeneration.compute(formula, formula.variables());
+        final Backbone backbone = computeBackbone(formula);
         if (!backbone.isSat()) {
             return f.falsum();
         }
@@ -118,6 +122,13 @@ public final class AdvancedSimplifier implements FormulaTransformation {
         final Formula minDnf = f.or(negateAllLiteralsInFormulas(minimizedPIs, f).stream().map(f::and).collect(Collectors.toList()));
         final Formula fullFactor = minDnf.transform(new FactorOutSimplifier(this.ratingFunction));
         return f.and(f.and(backboneLiterals), fullFactor).transform(new NegationSimplifier());
+    }
+
+    private Backbone computeBackbone(final Formula formula) {
+        final SATHandler satHandler = handler == null ? null : handler.satHandler();
+        final MiniSat miniSat = MiniSat.miniSat(formula.factory(), MiniSatConfig.builder().cnfMethod(MiniSatConfig.CNFMethod.PG_ON_SOLVER).build());
+        miniSat.add(formula);
+        return miniSat.execute(BackboneFunction.builder().handler(satHandler).variables(formula.variables()).type(BackboneType.POSITIVE_AND_NEGATIVE).build());
     }
 
     private List<Formula> negateAllLiterals(final Collection<SortedSet<Literal>> literalSets, final FormulaFactory f) {
