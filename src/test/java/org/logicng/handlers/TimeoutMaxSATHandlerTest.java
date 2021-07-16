@@ -113,11 +113,11 @@ class TimeoutMaxSATHandlerTest {
         for (final MaxSATSolver solver : this.solvers) {
             final int weight = solver.isWeighted() ? 2 : 1;
             formulas.forEach(c -> solver.addSoftFormula(c, weight));
-            final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(100);
+            final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(10L);
 
             final MaxSAT.MaxSATResult solve = solver.solve(handler);
 
-            assertThat(handler.aborted).isTrue();
+            assertThat(handler.aborted()).isTrue();
             assertThat(solve).isEqualTo(MaxSAT.MaxSATResult.UNDEF);
         }
     }
@@ -128,11 +128,11 @@ class TimeoutMaxSATHandlerTest {
         for (final MaxSATSolver solver : this.solvers) {
             final int weight = solver.isWeighted() ? 2 : 1;
             ph.forEach(c -> solver.addSoftFormula(c, weight));
-            final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(System.currentTimeMillis() + 100, TimeoutHandler.TimerType.FIXED_END);
+            final TimeoutMaxSATHandler handler = new TimeoutMaxSATHandler(System.currentTimeMillis() + 100L, TimeoutHandler.TimerType.FIXED_END);
 
             final MaxSAT.MaxSATResult solve = solver.solve(handler);
 
-            assertThat(handler.aborted).isTrue();
+            assertThat(handler.aborted()).isTrue();
             assertThat(solve).isEqualTo(MaxSAT.MaxSATResult.UNDEF);
         }
     }
