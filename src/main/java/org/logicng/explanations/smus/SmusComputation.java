@@ -103,17 +103,13 @@ public final class SmusComputation {
         start(handler);
         final SATSolver growSolver = MiniSat.miniSat(f);
         growSolver.add(additionalConstraints == null ? Collections.singletonList(f.verum()) : additionalConstraints);
-        boolean sat = growSolver.sat(satHandler(handler)) == Tristate.TRUE;
-        if (aborted(handler)) {
-            return null;
-        }
         final Map<Variable, P> propositionMapping = new TreeMap<>();
         for (final P proposition : propositions) {
             final Variable selector = f.variable(PROPOSITION_SELECTOR + propositionMapping.size());
             propositionMapping.put(selector, proposition);
             growSolver.add(f.equivalence(selector, proposition.formula()));
         }
-        sat = growSolver.sat(satHandler(handler), propositionMapping.keySet()) == Tristate.TRUE;
+        final boolean sat = growSolver.sat(satHandler(handler), propositionMapping.keySet()) == Tristate.TRUE;
         if (aborted(handler)) {
             return null;
         }

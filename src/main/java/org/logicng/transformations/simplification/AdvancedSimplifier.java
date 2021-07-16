@@ -114,9 +114,8 @@ public final class AdvancedSimplifier implements FormulaTransformation {
             return null;
         }
         final List<SortedSet<Literal>> primeImplicants = primeResult.getPrimeImplicants();
-        final List<Formula> minimizedPIs = SmusComputation.computeSmusForFormulas(negateAllLiterals(primeImplicants, f), Collections.singletonList(restrictedFormula), f,
-                this.handler
-        );
+        final List<Formula> minimizedPIs = SmusComputation.computeSmusForFormulas(negateAllLiterals(primeImplicants, f),
+                Collections.singletonList(restrictedFormula), f, this.handler);
         if (aborted(this.handler)) {
             return null;
         }

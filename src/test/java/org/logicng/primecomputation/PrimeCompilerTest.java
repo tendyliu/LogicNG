@@ -169,16 +169,20 @@ public class PrimeCompilerTest extends TestWithExampleFormulas {
     }
 
     @Test
-    public void testOptimizationCancelled() throws ParserException {
+    public void testCancellationPoints() throws IOException, ParserException {
+        final Formula formula = f.parse(Files.readAllLines(Paths.get("src/test/resources/formulas/simplify_formulas.txt")).get(0));
         final List<Pair<PrimeCompiler, PrimeResult.CoverageType>> compilers = Arrays.asList(
                 new Pair<>(PrimeCompiler.getWithMaximization(), PrimeResult.CoverageType.IMPLICANTS_COMPLETE),
                 new Pair<>(PrimeCompiler.getWithMaximization(), PrimeResult.CoverageType.IMPLICATES_COMPLETE),
                 new Pair<>(PrimeCompiler.getWithMinimization(), PrimeResult.CoverageType.IMPLICANTS_COMPLETE),
                 new Pair<>(PrimeCompiler.getWithMinimization(), PrimeResult.CoverageType.IMPLICATES_COMPLETE));
         for (final Pair<PrimeCompiler, PrimeResult.CoverageType> compiler : compilers) {
-            final OptimizationHandler handler = new BoundedOptimizationHandler(-1, 0);
-            final Formula formula = f.parse("a&(b|c)");
-            testHandler(handler, formula, compiler.first(), compiler.second(), true);
+            for (int numOptimizationStarts = 1; numOptimizationStarts < 5; numOptimizationStarts++) {
+                for (int numSatHandlerStarts = 1; numSatHandlerStarts < 10; numSatHandlerStarts++) {
+                    final OptimizationHandler handler = new BoundedOptimizationHandler(numSatHandlerStarts, numOptimizationStarts);
+                    testHandler(handler, formula, compiler.first(), compiler.second(), true);
+                }
+            }
         }
     }
 

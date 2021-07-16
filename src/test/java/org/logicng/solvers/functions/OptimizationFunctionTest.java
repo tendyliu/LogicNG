@@ -45,11 +45,13 @@ import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.FormulaFactoryConfig;
 import org.logicng.formulas.Literal;
 import org.logicng.formulas.Variable;
+import org.logicng.handlers.BoundedOptimizationHandler;
 import org.logicng.handlers.OptimizationHandler;
 import org.logicng.handlers.SATHandler;
 import org.logicng.handlers.TimeoutOptimizationHandler;
 import org.logicng.io.parsers.ParserException;
 import org.logicng.io.parsers.PseudoBooleanParser;
+import org.logicng.io.readers.DimacsReader;
 import org.logicng.io.readers.FormulaReader;
 import org.logicng.predicates.satisfiability.SATPredicate;
 import org.logicng.solvers.MaxSATSolver;
@@ -351,7 +353,35 @@ public class OptimizationFunctionTest implements LogicNGTest {
         assertThat(modelCustom).isNull();
         assertThat(customHandler.aborted()).isTrue();
         assertThat(customHandler.currentResult).isNotNull();
+    }
 
+    @LongRunningTag
+    @ParameterizedTest
+    @MethodSource("solvers")
+    public void testCancellationPoints(final SATSolver solver) throws IOException {
+        final FormulaFactory f = new FormulaFactory();
+        final SortedSet<Variable> selVars = new TreeSet<>();
+        final List<Formula> clauses = DimacsReader.readCNF("src/test/resources/sat/c499_gr_rcs_w6.shuffled.cnf", f);
+        final List<Formula> formulas = new ArrayList<>();
+        for (final Formula clause : clauses) {
+            final Variable selVar = f.variable("@SEL_" + selVars.size());
+            selVars.add(selVar);
+            formulas.add(f.equivalence(selVar, clause));
+        }
+        for (int numSatHandlerStarts = 1; numSatHandlerStarts < 5; numSatHandlerStarts++) {
+            solver.reset();
+            solver.add(formulas);
+            final OptimizationHandler handler = new BoundedOptimizationHandler(numSatHandlerStarts, -1);
+            final OptimizationFunction optimizationFunction = OptimizationFunction.builder()
+                    .handler(handler)
+                    .literals(selVars)
+                    .maximize().build();
+
+            final Assignment result = solver.execute(optimizationFunction);
+
+            assertThat(handler.aborted()).isTrue();
+            assertThat(result).isNull();
+        }
     }
 
     private int solveMaxSat(final List<Formula> formulas, final SortedSet<Variable> variables, final MaxSATSolver solver) {

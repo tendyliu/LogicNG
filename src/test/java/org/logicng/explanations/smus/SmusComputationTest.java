@@ -39,7 +39,9 @@ import org.logicng.handlers.OptimizationHandler;
 import org.logicng.handlers.TimeoutHandler;
 import org.logicng.handlers.TimeoutOptimizationHandler;
 import org.logicng.io.parsers.ParserException;
+import org.logicng.io.readers.DimacsReader;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -268,6 +270,17 @@ public class SmusComputationTest extends TestWithExampleFormulas {
         );
         for (final TimeoutOptimizationHandler handler : handlers) {
             testHandler(handler, formulas, true);
+        }
+    }
+
+    @Test
+    public void testCancellationPoints() throws IOException {
+        final List<Formula> formulas = DimacsReader.readCNF("src/test/resources/sat/unsat/bf0432-007.cnf", f);
+        for (int numOptimizationStarts = 1; numOptimizationStarts < 5; numOptimizationStarts++) {
+            for (int numSatHandlerStarts = 1; numSatHandlerStarts < 10; numSatHandlerStarts++) {
+                final OptimizationHandler handler = new BoundedOptimizationHandler(numSatHandlerStarts, numOptimizationStarts);
+                testHandler(handler, formulas, true);
+            }
         }
     }
 
