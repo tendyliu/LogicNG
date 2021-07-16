@@ -33,7 +33,7 @@ package org.logicng.handlers;
  * @version 2.1.0
  * @since 1.6.2
  */
-public final class TimeoutBDDHandler extends TimeoutHandler implements BDDHandler {
+public class TimeoutBDDHandler extends TimeoutHandler implements BDDHandler {
 
     /**
      * Constructs a new timeout handler with a given timeout and a timeout type. The interpretation of the timeout depends on the timeout type:
