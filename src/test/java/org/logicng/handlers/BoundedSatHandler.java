@@ -3,22 +3,22 @@ package org.logicng.handlers;
 /**
  * Bounded SAT handler for testing purposes.
  * <p>
- * The handler aborts the computation if a certain number of conflicts is reached.
+ * The handler aborts the computation if a certain number of starts is reached.
  * @version 2.1.0
  * @since 2.1.0
  */
 public class BoundedSatHandler implements SATHandler {
-    private final int conflictsLimit;
-    private int numConflicts;
+    private final int startsLimit;
+    private int numStarts;
     private boolean aborted;
 
     /**
-     * Constructs a new instance with the given conflicts limit.
-     * @param conflictsLimit the conflicts limit, if -1 then no limit is set
+     * Constructs a new instance with the given starts limit.
+     * @param startsLimit the number of starts limit, if -1 then no limit is set
      */
-    public BoundedSatHandler(final int conflictsLimit) {
-        this.conflictsLimit = conflictsLimit;
-        this.numConflicts = 0;
+    public BoundedSatHandler(final int startsLimit) {
+        this.startsLimit = startsLimit;
+        this.numStarts = 0;
     }
 
     @Override
@@ -28,12 +28,11 @@ public class BoundedSatHandler implements SATHandler {
 
     @Override
     public void started() {
-        // do nothing
+        this.aborted = startsLimit != -1 && ++numStarts >= startsLimit;
     }
 
     @Override
     public boolean detectedConflict() {
-        this.aborted = conflictsLimit != -1 && ++numConflicts >= conflictsLimit;
         return !aborted;
     }
 }
