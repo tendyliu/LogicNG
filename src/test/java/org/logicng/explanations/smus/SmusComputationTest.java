@@ -107,9 +107,8 @@ public class SmusComputationTest extends TestWithExampleFormulas {
                 this.f.parse("~m|n"),
                 this.f.parse("~n|s")
         );
-        assertThatThrownBy(() -> SmusComputation.computeSmusForFormulas(input, Arrays.asList(this.f.parse("~a&b"), this.f.parse("a|~b")), this.f))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Cannot compute a smallest MUS for a set of unsatisfiable additional constraints.");
+        final List<Formula> result = SmusComputation.computeSmusForFormulas(input, Arrays.asList(this.f.parse("~a&b"), this.f.parse("a|~b")), this.f);
+        assertThat(result).isEmpty();
     }
 
     @Test

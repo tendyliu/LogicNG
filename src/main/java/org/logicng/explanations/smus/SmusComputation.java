@@ -107,9 +107,6 @@ public final class SmusComputation {
         if (aborted(handler)) {
             return null;
         }
-        if (!sat) {
-            throw new IllegalArgumentException("Cannot compute a smallest MUS for a set of unsatisfiable additional constraints.");
-        }
         final Map<Variable, P> propositionMapping = new TreeMap<>();
         for (final P proposition : propositions) {
             final Variable selector = f.variable(PROPOSITION_SELECTOR + propositionMapping.size());
