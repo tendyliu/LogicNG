@@ -70,7 +70,7 @@ public final class DeletionBasedMUS extends MUSAlgorithm {
             for (final Proposition prop : mus) {
                 solver.add(prop);
             }
-            sat = solver.sat() == Tristate.TRUE;
+            sat = solver.sat(config.handler) == Tristate.TRUE;
             if (aborted(config.handler)) {
                 return null;
             }
