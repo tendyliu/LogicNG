@@ -117,6 +117,7 @@ class TimeoutMaxSATHandlerTest {
 
             final MaxSAT.MaxSATResult solve = solver.solve(handler);
 
+            assertThat(handler.aborted).isTrue();
             assertThat(solve).isEqualTo(MaxSAT.MaxSATResult.UNDEF);
         }
     }
@@ -131,6 +132,7 @@ class TimeoutMaxSATHandlerTest {
 
             final MaxSAT.MaxSATResult solve = solver.solve(handler);
 
+            assertThat(handler.aborted).isTrue();
             assertThat(solve).isEqualTo(MaxSAT.MaxSATResult.UNDEF);
         }
     }

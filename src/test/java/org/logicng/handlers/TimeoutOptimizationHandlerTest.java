@@ -18,7 +18,6 @@ import org.logicng.solvers.SATSolver;
 import org.logicng.solvers.functions.OptimizationFunction;
 import org.logicng.solvers.sat.GlucoseConfig;
 import org.logicng.solvers.sat.MiniSatConfig;
-import org.logicng.testutils.PigeonHoleGenerator;
 import org.logicng.util.FormulaHelper;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,13 +29,11 @@ import java.util.List;
 class TimeoutOptimizationHandlerTest {
 
     private FormulaFactory f;
-    private PigeonHoleGenerator pg;
     private SATSolver[] solvers;
 
     @BeforeEach
     public void init() {
         this.f = new FormulaFactory();
-        this.pg = new PigeonHoleGenerator(this.f);
         this.solvers = new SATSolver[8];
         this.solvers[0] = MiniSat.miniSat(this.f, MiniSatConfig.builder().incremental(true).build());
         this.solvers[1] = MiniSat.miniSat(this.f, MiniSatConfig.builder().incremental(false).build());

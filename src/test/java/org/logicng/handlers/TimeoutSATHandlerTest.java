@@ -94,6 +94,7 @@ class TimeoutSATHandlerTest {
 
             final Tristate result = solver.sat(handler);
 
+            assertThat(handler.aborted).isTrue();
             assertThat(result).isEqualTo(Tristate.UNDEF);
         }
     }
@@ -106,6 +107,7 @@ class TimeoutSATHandlerTest {
 
             final Tristate result = solver.sat(handler);
 
+            assertThat(handler.aborted).isTrue();
             assertThat(result).isEqualTo(Tristate.UNDEF);
         }
     }
